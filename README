@@ -1,0 +1,11 @@
+设计思路
+采集图片和数据
+
+由nginx反向代理tcp连接;redis以生产者和消费者模式运行;多个异步tcp服务器(tcp_server.py)负责后端处理，将收到的数据利用redis_productor写入redis，redis_consumer负责将redis里面的数据写入mongodb
+
+利用python3.5 curio模块实现异步tcp服务器
+利用python3.5 asyncio_redis模块redis异步操作
+
+利用curio设置超时
+
+tornado.gen.with_timeout 设置future超时
