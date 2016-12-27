@@ -1,0 +1,98 @@
+2016-12-26 21:36:33,118	File "server.py",line 100	INFO: 127.0.0.1:39580 disconnect
+2016-12-26 21:37:17,080	File "server.py",line 63	INFO: Received: test
+2016-12-26 21:37:17,081	File "server.py",line 73	ERROR: Exception: 'TornadoTCPConnection' object has no attribute 'background_wait_task'
+2016-12-26 21:38:21,222	File "server.py",line 63	INFO: Received: test
+2016-12-26 21:38:21,222	File "server.py",line 98	INFO: 127.0.0.1:39584 disconnect
+2016-12-26 21:40:04,953	File "server.py",line 63	INFO: Received: tset
+test
+2016-12-26 21:40:04,954	File "server.py",line 98	INFO: 127.0.0.1:39586 disconnect
+2016-12-26 22:35:52,734	File "server.py",line 71	ERROR: Exception: 'utf-8' codec can't decode byte 0xee in position 0: invalid continuation byte
+2016-12-26 22:36:06,319	File "server.py",line 98	INFO: 127.0.0.1:39676 disconnect
+2016-12-26 22:36:09,439	File "server.py",line 63	INFO: Received: test
+2016-12-26 22:36:09,439	File "server.py",line 98	INFO: 127.0.0.1:39678 disconnect
+2016-12-26 22:39:35,942	File "tcpserver.py",line 278	ERROR: Error in connection callback
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.5/dist-packages/tornado/tcpserver.py", line 274, in _handle_connection
+    future = self.handle_stream(stream, address)
+  File "server.py", line 26, in handle_stream
+    TornadoTCPConnection(stream, address, io_loop=self.io_loop)
+  File "server.py", line 50, in __init__
+    self.stream.ready_bytes(callback=stack_context.wrap(self._on_message_receive_complete), partial=True)
+AttributeError: 'IOStream' object has no attribute 'ready_bytes'
+2016-12-26 22:39:55,029	File "tcpserver.py",line 278	ERROR: Error in connection callback
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.5/dist-packages/tornado/tcpserver.py", line 274, in _handle_connection
+    future = self.handle_stream(stream, address)
+  File "server.py", line 26, in handle_stream
+    TornadoTCPConnection(stream, address, io_loop=self.io_loop)
+  File "server.py", line 50, in __init__
+    self.stream.read_bytes(callback=stack_context.wrap(self._on_message_receive_complete), partial=True)
+TypeError: read_bytes() missing 1 required positional argument: 'num_bytes'
+2016-12-26 22:41:14,263	File "server.py",line 63	INFO: Received: dd
+2016-12-26 22:41:14,263	File "server.py",line 98	INFO: 127.0.0.1:39684 disconnect
+2016-12-26 22:42:24,747	File "server.py",line 63	INFO: Received: eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
+2016-12-26 22:42:24,747	File "server.py",line 98	INFO: 127.0.0.1:39686 disconnect
+2016-12-26 22:43:13,546	File "server.py",line 63	INFO: Received: testetestetestetestetestetestetestetestetestetesteeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
+2016-12-26 22:43:13,547	File "server.py",line 98	INFO: 127.0.0.1:39688 disconnect
+2016-12-26 22:44:16,332	File "tcpserver.py",line 278	ERROR: Error in connection callback
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.5/dist-packages/tornado/tcpserver.py", line 274, in _handle_connection
+    future = self.handle_stream(stream, address)
+  File "server.py", line 26, in handle_stream
+    TornadoTCPConnection(stream, address, io_loop=self.io_loop)
+  File "server.py", line 50, in __init__
+    self.stream.read_bytes(num_bytes = 1000, stream_callback=stack_context.wrap(self._on_message_receive_complete), partial=False)
+TypeError: read_bytes() got an unexpected keyword argument 'stream_callback'
+2016-12-26 22:44:41,289	File "server.py",line 63	INFO: Received: eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
+2016-12-26 22:44:41,290	File "concurrent.py",line 341	ERROR: Future <tornado.concurrent.Future object at 0x7fb68fb1ae80> exception was never retrieved: tornado.iostream.StreamClosedError: Stream is closed
+2016-12-26 22:44:41,290	File "server.py",line 98	INFO: 127.0.0.1:39692 disconnect
+2016-12-26 22:45:25,033	File "server.py",line 63	INFO: Received: eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
+2016-12-26 22:45:32,937	File "server.py",line 63	INFO: Received: eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
+2016-12-26 22:45:34,393	File "server.py",line 63	INFO: Received: eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
+2016-12-26 22:45:51,827	File "server.py",line 63	INFO: Received: eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
+2016-12-26 22:45:52,737	File "server.py",line 63	INFO: Received: eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
+2016-12-26 22:45:53,921	File "server.py",line 63	INFO: Received: eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
+2016-12-26 22:46:50,528	File "server.py",line 63	INFO: Received: eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
+2016-12-26 22:46:51,576	File "server.py",line 63	INFO: Received: eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
+2016-12-26 22:46:52,272	File "server.py",line 63	INFO: Received: eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
+2016-12-26 22:47:04,736	File "server.py",line 63	INFO: Received: eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
+2016-12-26 22:47:08,912	File "server.py",line 63	INFO: Received: eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
+2016-12-26 22:47:11,480	File "server.py",line 63	INFO: Received: eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
+2016-12-26 22:47:50,223	File "server.py",line 63	INFO: Received: eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
+2016-12-26 22:47:59,344	File "server.py",line 63	INFO: Received: eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
+2016-12-26 22:48:53,551	File "server.py",line 63	INFO: Received: eeee
+2016-12-26 22:49:49,214	File "server.py",line 63	INFO: Received: eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
+2016-12-26 22:50:59,174	File "server.py",line 63	INFO: Received: eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
+2016-12-26 22:51:38,726	File "server.py",line 63	INFO: Received: eeeeeeeeeeeeeeeee
+2016-12-26 22:51:40,237	File "server.py",line 63	INFO: Received: eeeeeeeeeeeeeeeee
+2016-12-26 22:51:41,701	File "server.py",line 63	INFO: Received: eeeeeeeeeeeeeeeee
+2016-12-26 22:51:42,861	File "server.py",line 63	INFO: Received: eeeeeeeeeeeee
+2016-12-26 22:52:04,526	File "concurrent.py",line 341	ERROR: Future <tornado.concurrent.Future object at 0x7f8211fd2b38> exception was never retrieved: tornado.iostream.StreamClosedError: Stream is closed
+2016-12-26 22:52:04,526	File "server.py",line 95	INFO: 127.0.0.1:39718 disconnect
+2016-12-26 22:52:40,504	File "server.py",line 63	INFO: Received: eeeeeeeeeeeeeeeee
+2016-12-26 22:52:41,077	File "server.py",line 63	INFO: Received: eeeeeeeeeeeeeeeee
+2016-12-26 22:52:41,549	File "server.py",line 63	INFO: Received: eeeeeeeeeeeeeeeee
+2016-12-26 22:52:42,269	File "server.py",line 63	INFO: Received: eeeeeeeeeeeee
+2016-12-27 16:42:53,416	File "server.py",line 74	ERROR: Exception: 'utf-8' codec can't decode byte 0xee in position 0: unexpected end of data
+2016-12-27 16:43:09,205	File "server.py",line 69	INFO: Received: ee
+2016-12-27 16:43:14,292	File "server.py",line 69	INFO: Received: ee
+2016-12-27 16:43:29,366	File "server.py",line 69	INFO: Received: ee
+2016-12-27 16:43:32,158	File "server.py",line 69	INFO: Received: ee
+2016-12-27 16:43:33,021	File "server.py",line 69	INFO: Received: ee
+2016-12-27 16:43:33,500	File "server.py",line 69	INFO: Received: ee
+2016-12-27 16:43:34,892	File "server.py",line 69	INFO: Received: ee
+2016-12-27 16:43:59,308	File "server.py",line 69	INFO: Received: ee
+2016-12-27 16:43:59,854	File "server.py",line 69	INFO: Received: ee
+2016-12-27 16:44:00,204	File "server.py",line 69	INFO: Received: ee
+2016-12-27 16:44:00,508	File "server.py",line 69	INFO: Received: ee
+2016-12-27 16:44:00,788	File "server.py",line 69	INFO: Received: ee
+2016-12-27 16:44:25,397	File "server.py",line 69	INFO: Received: ee
+2016-12-27 16:55:08,097	File "server.py",line 60	INFO: 127.0.0.1:46728 connection timeout.
+2016-12-27 16:55:08,097	File "server.py",line 107	INFO: 127.0.0.1:46728 disconnect
+2016-12-27 17:25:27,824	File "server.py",line 60	INFO: 127.0.0.1:46732 connection timeout.
+2016-12-27 17:25:27,824	File "server.py",line 107	INFO: 127.0.0.1:46732 disconnect
+2016-12-27 20:49:09,719	File "server.py",line 64	INFO: 127.0.0.1:47530 connection timeout.
+2016-12-27 20:49:09,719	File "server.py",line 166	INFO: 127.0.0.1:47530 disconnect
+2016-12-27 20:50:22,752	File "server.py",line 167	INFO: 127.0.0.1:47724 disconnect
+2016-12-27 20:54:45,534	File "server.py",line 168	INFO: 127.0.0.1:47990 disconnect
+2016-12-27 20:54:51,074	File "server.py",line 168	INFO: 127.0.0.1:47992 disconnect
