@@ -10,6 +10,20 @@
 
 tornado.gen.with_timeout 设置future超时
 
+采集数据接收到后第一时间文本储存,随后入库,避免数据丢失
+
+数据库利用mysql5.7中可以存储JSON的特性,数据库里面包括的有主键ID字段,DeviceID设备ID字段,Millisecond数据采集时间字段和JSON字段(JSON里面只保存不定数量的数据key和数据value)
+
+由服务器端生成关于终端数据格式的配置文件('%s.conf'%device_id),保存在服务器端,并推送到设备终端,终端按照这个配置文件传输数据------是以文本的形式保存还是以JSON的格式保存在数据库里面,以怎样的形式推送给终端
+
+数据查询相关:数据查询的常用sql select JSON,Millisecond from xx where DeviceID = xx and Millisecond between xx and xx 是否需要根据Device进行分区
+
+数据下载相关:数据量比较小的直接查询下载   数据量比较大的在服务器端生成zip 然后把下载地址发给用户
+
+报警相关:定义报警规则 数据的报警只能是如果数值＞,＝,＜或者在某一个区间报警(低电量报警实际也属于这个部分) 通讯丢失报警 如果在数据保存的时候不解析JSON里面的值怎么实现报警
+
+用户管理与权限相关:用户的权限包括它可以管理哪些台站,manager alerts,数据下载    用户管理
+
 需求整理
 
 1.上传数据
@@ -31,3 +45,5 @@ json格式 Method键的值为pushImage，另外信息里面还包括要传的图
 服务器回复pushImageReady表示服务器准备好接受图片
 终端不断的发送512个字节一包的数据，直到发完
 服务器回复imageUploaded
+
+5.发送conf文件

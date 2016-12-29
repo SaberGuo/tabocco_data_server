@@ -35,7 +35,7 @@ class TornadoTCPConnection(object):
 
 		print('Connected!!!!')
 		self.json_request = {}
-		self.data_store = None
+		# self.data_store = None
 		self.encoder = json.JSONEncoder()
 		self.DeviceID = ''
 		self.image_size = 0
@@ -46,16 +46,12 @@ class TornadoTCPConnection(object):
 		self.address_string = '{}:{}'.format(address[0], address[1])
 		# self.address_family = stream.socket.family
 
-		# 定义帧尾
-		# self.EOF = b'test'
-
 		self._clear_request_state()
 		# self._message_callback = stack_context.wrap(self._on_message_receive_complete)
 		self.stream.set_close_callback(stack_context.wrap(self._on_connection_close))
 		# self._write_callback = self.close
 		#从连接建立开始计时，如果连接超过macro中定义的TCP_CONNECTION_TIMEOUT，则服务端主动断开
 		self.timeout_handle = self.io_loop.add_timeout(self.io_loop.time() + macro.TCP_CONNECTION_TIMEOUT, stack_context.wrap(self._on_timeout))
-		# self.stream.read_until(self.EOF, stack_context.wrap(self._on_message_receive_complete))
 		# self.stream.read_bytes(num_bytes = 10, callback=stack_context.wrap(self._on_message_receive_complete), partial=False)
 		self.stream.read_bytes(num_bytes = 512, callback=stack_context.wrap(self._on_message_receive), partial=True)
 
@@ -77,16 +73,18 @@ class TornadoTCPConnection(object):
 			logging.error("Exception: %s", str(ex))
 
 	def _on_message_receive(self, data):
-		if self.data_store == None:
-			self.data_store = data
-		else:
-			self.data_store += data
+		# if self.data_store == None:
+		# 	self.data_store = data
+		# else:
+		# 	self.data_store += data
 		try:
-			data_str = self.data_store.decode()
+			# data_str = self.data_store.decode()
+			data_str = data.decode()
 			print(data_str)
 			self.json_request = json.loads(data_str)
 			if self.json_request.has_key('Method'):
-				self.DeviceID = self.json_request['DeviceID']
+				if self.DeviceID != '':
+					self.DeviceID = self.json_request['DeviceID']
 				request = self.json_request['Method']
 				if request == 'pullTime':
 					self._on_pullTime_request()
@@ -99,25 +97,25 @@ class TornadoTCPConnection(object):
 				elif request == 'paramsUpdated':
 					self.close()
 			else:
-				raise Exception('json request incomplete!')
+				raise Exception('json request error!')
 		except Exception as e:
 			print(e)
 			self.json_request = {}
 			self.stream.read_bytes(num_bytes = 512, callback=stack_context.wrap(self._on_message_receive), partial=True)
 
 	def _on_pullTime_request(self):
-		self.data_store = None
+		# self.data_store = None
 		self.write(int(time.time()), callback = stack_context.wrap(self.close))
 
 	def _on_pushDatas_request(self, data):
-		self.data_store = None
+		# self.data_store = None
 		redis_connection = redis.StrictRedis()
 		redis_connection.lpush(macro.REDIS_LIST_KEY, self.encoder.encode(data))
 		reply_data = {'DeviceID':self.DeviceID, 'Method':'dataUploaded'}
 		self.write(self.encoder.encode(reply_data), callback = stack_context.wrap(self.close))
 
 	def _on_pushParams_request(self):
-		self.data_store = None
+		# self.data_store = None
 		control_data = {}
 		self.write(self.encoder.encode(control_data), callback=stack_context.wrap(self._wait_pushParams_reply))
 
@@ -125,7 +123,7 @@ class TornadoTCPConnection(object):
 		self.stream.read_bytes(num_bytes = 512, callback=stack_context.wrap(self._on_message_receive), partial=True)
 
 	def _on_pushImage_request(self, data):
-		self.data_store = None
+		# self.data_store = None
 		self.image_size = data['Package']['size']
 		self.image_time = data['Package']['Millisecond']
 		reply_data = {'DeviceID':self.DeviceID, 'Method':'pushImageReady'}
@@ -139,10 +137,6 @@ class TornadoTCPConnection(object):
 		# image save operation
 		reply_data = {'DeviceID':self.DeviceID, 'Method':'ImageUploaded'}
 		self.write(self.encoder.encode(reply_data), callback = stack_context.wrap(self.close))
-
-	def example(self):
-		r = redis.StrictRedis()
-		result = r.lpush('test')
 
 	def _clear_request_state(self):
 		"""Clears the per-request state.
