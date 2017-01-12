@@ -1,6 +1,7 @@
 #!/usr/bin/env python   
 # -*- coding:utf-8 -*-
 
+import json
 import redis
 import commons.macro
 import argparse
@@ -16,9 +17,18 @@ class RedisConsumer(object):
 	def start(self):
 		while True:
 			item=self.redis_connection.blpop(self.key)
-			data = item[1]
-			print(data)
-			
+			data = json.loads(item[1])
+			sql = ''
+			db_name = ''
+			with database_resource() as cursor:
+				if data['type'] = 'image':
+					db_name = 'device_image'
+					
+				else:
+					db_name = 'device_data'
+				sql = 'insert into `%s` (`device_id`, `device_config_id`, `ts`, `data`) values \
+					(`%s`, `%s`, `%s`, `%s`)'%(db_name, data['device_id'], data['device_config_id'], data['ts'], json.dumps(data['data']))
+				cursor.execute(sql)
 
 
 if __name__ == '__main__':
@@ -36,4 +46,4 @@ if __name__ == '__main__':
 	try:
 		redis_consumer.start()
 	except KeyboardInterrupt:
-	    pass
+		pass

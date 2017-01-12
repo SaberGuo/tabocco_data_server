@@ -167,7 +167,6 @@ class TornadoTCPConnection(object):
 
 	def close(self):
 		self.stream.close()
-		# Remove this reference to self, which would otherwise cause a 
 		self.clear_request_state()
 
 	def write(self, chunk, callback=None):
