@@ -2,8 +2,9 @@
 # -*- coding:utf-8 -*-
 
 import redis
-import macro
+import commons.macro
 import argparse
+from tools.db_tools import database_resource
 
 class RedisConsumer(object):
 	"""docstring for RedisConsumer"""
@@ -17,7 +18,7 @@ class RedisConsumer(object):
 			item=self.redis_connection.blpop(self.key)
 			data = item[1]
 			print(data)
-			# mongodb operation below
+			
 
 
 if __name__ == '__main__':
