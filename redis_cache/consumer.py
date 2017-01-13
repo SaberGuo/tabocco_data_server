@@ -26,8 +26,8 @@ class RedisConsumer(object):
 					
 				else:
 					db_name = 'device_data'
-				sql = 'insert into `%s` (`device_id`, `device_config_id`, `ts`, `data`) values \
-					(`%s`, `%s`, `%s`, `%s`)'%(db_name, data['device_id'], data['device_config_id'], data['ts'], json.dumps(data['data']))
+				sql = "insert into `%s` (`device_id`, `device_config_id`, `ts`, `data`) values \
+					('%s', %d, '%s', '%s')"%(db_name, data['device_id'], data['device_config_id'], data['ts'], json.dumps(data['data']))
 				cursor.execute(sql)
 
 

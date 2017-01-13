@@ -5,7 +5,7 @@ import json
 import tornado
 import logging
 import argparse
-import commons.macro
+from commons.macro import *
 from tornado import gen, ioloop, stack_context
 from tornado.tcpserver import TCPServer
 from tools import *
@@ -26,21 +26,13 @@ class TornadoTCPConnection(object):
 	executor = ThreadPoolExecutor(max_workers=self.MAX_WORKERS)
 
 	def __init__(self, stream, address, io_loop):
-		print('Connected!!!!')
 		self.json_request = {}
-		# self.encoder = json.JSONEncoder()
-		self.device_id = ''
-		self.device_config_id = ''
-		self.image_size = 0
-		self.image_key = ''
-		self.image_acquisition_time = 0
 		self.stream = stream
 		self.address = address
 		self.io_loop = io_loop
 		self.address_string = '{}:{}'.format(address[0], address[1])
 		self.clear_request_state()
 		self.stream.set_close_callback(stack_context.wrap(self.on_connection_close))
-		#从连接建立开始计时，如果连接超过macro中定义的TCP_CONNECTION_TIMEOUT，则服务端主动断开
 		self.timeout_handle = self.io_loop.add_timeout(self.io_loop.time() + macro.TCP_CONNECTION_TIMEOUT, stack_context.wrap(self.on_timeout))
 		self.stream.read_bytes(num_bytes = 512, callback=stack_context.wrap(self.on_message_receive), partial=True)
 
@@ -50,17 +42,16 @@ class TornadoTCPConnection(object):
 
 	def on_message_receive(self, data):
 		try:
-			data_str = data.decode()
-			print(data_str)
-			self.json_request = json.loads(data_str)
+			tmp = json.loads(data_str)
+			for k, v in tmp.iteritems():
+				if not self.json_request.has_key(k):
+					self.json_request[k] = v
 			if self.json_request.has_key('method'):
-				if self.device_id != '':
-					self.device_id = self.json_request['device_id']
 				request = self.json_request['method']
 				elif request == 'push_data':
 					self.on_push_data_request(self.json_request)
 				elif request == 'pull_param':
-					self.on_pull_param_request()
+					self.on_pull_param_request(self.json_request)
 				elif request == 'push_image':
 					self.on_push_image_request(self.json_request)
 				elif request == 'param_updated':
@@ -71,68 +62,49 @@ class TornadoTCPConnection(object):
 			print(e)
 			self.on_error_request()
 
-	def on_error_request(self):
-		send_back = {'method':'failed','ts':int(time.time())}
-		self.write(json.dumps(send_back), callback = stack_context.wrap(self.close))
-
 	def on_push_data_request(self, request):
-		device_config_id = request['device_config_id']
-		for k, v in request['package'].iteritems():
-			tmp_data = {}
-			tmp_data['type'] = 'data'
-			tmp_data['device_id'] = self.device_id
-			tmp_data['device_config_id'] = device_config_id
-			tmp_data['data'] = v
-			tmp_data['ts'] = int(k)
-			producer.insert_into_redis(tmp_data)
-		reply_data = {'device_id':self.device_id, 'method':'data_uploaded', 'ts':int(time.time())}
-		self.write(json.dumps(reply_data), callback = stack_context.wrap(self.close))
+		flag = True
+		for ts, data in request['package'].iteritems():
+			flag = flag or (producer.insert_into_redis(get_data_to_save(request, ts, data), REDIS_LIST_KEY))
+		if flag:
+			self.stream.write(get_reply(self.json_request), callback = stack_context.wrap(self.close))
+		else:
+			self.on_error_request()
 
-	def on_pull_param_request(self):
-		param = {}
-		with database_resource() as cursor:
-			sql = 'select `%s`, `%s` from `%s` where `%s` = `%s`'%('id', 'data', 'device_config', 'device_id', self.device_id)
-			cursor.execute(sql)
-			value = cursor.fetchone()
-			device_config_id = value[0]
-			data = json.loads(value[1])
-			param['device_id'] = self.device_id
-			param['device_config_id'] = device_config_id
-			param['method'] = 'push_param'
-			param['config'] = data['config']
-			param['control'] = data['control']
-			param['ts'] = int(time.time())
-		self.write(json.dumps(param), callback=stack_context.wrap(self.wait_push_param_reply))
+	def on_pull_param_request(self, request):
+		param = get_latest_device_config(request['device_id'])
+		if param:
+			self.stream.write(param, callback=stack_context.wrap(self.wait_push_param_reply))
+		else:
+			self.on_error_request()
 
 	def wait_push_param_reply(self):
 		self.stream.read_bytes(num_bytes = 512, callback=stack_context.wrap(self.on_message_receive), partial=True)
 
-	def on_push_image_request(self, data):
-		self.device_config_id = data['device_config_id']
-		self.image_key = data['key']
-		self.image_size = data['size']
-		self.image_acquisition_time = data['acquisition_time']
-		reply_data = {'device_id':self.device_id, 'method':'push_image_ready'}
-		# self.write(self.encoder.encode(reply_data), callback = stack_context.wrap(self.start_receive_image_data))
-		self.write(json.dumps(reply_data), callback = stack_context.wrap(self.start_receive_image_data))
+	def on_push_image_request(self, request):
+		self.stream.write(get_reply(self.json_request), callback = stack_context.wrap(self.start_receive_image_data))
 
 	def start_receive_image_data(self):
-		self.stream.read_bytes(num_bytes = self.image_size, callback=stack_context.wrap(self.on_image_upload_complete), partial=False)
+		self.json_request['method'] = 'pushing_image'
+		self.stream.read_bytes(num_bytes = self.json_request['size'], callback=stack_context.wrap(self.on_image_upload_complete), partial=False)
 
 	def on_image_upload_complete(self, data):
-		filepath = check_device_img_file(self.device_id)
-		url = get_image_url_local(filepath, self.image_acquisition_time)
-		save_img_local(data, url)
-		image_value = {self.image_key:{'url':url}}
-		tmp_data = {'type':'image', 'device_id':self.device_id, 'device_config_id':self.device_config_id, 'data':image_value, 'ts':self.image_acquisition_time}
-		producer.insert_into_redis(tmp_data)
-		reply_data = {'device_id':self.device_id, 'method':'image_uploaded', 'ts':int(time.time())}
-		self.write(json.dumps(reply_data), callback=stack_context.wrap(self.close))
+		filepath = check_device_img_file(self.json_request['device_id'])
+		url = get_image_url_local(filepath, self.json_request['acquisition_time'])
+		save_image_local(data, url)
+		self.json_request['image_info'] = {self.json_request['key']:{'url':url}}
+		tmp_data = get_image_info_to_save(self.json_request)
+		if producer.insert_into_redis(tmp_data, REDIS_LIST_KEY):
+			self.stream.write(get_reply(self.json_request), callback=stack_context.wrap(self.close))
+		else:
+			self.on_error_request()
+
+	def on_error_request(self):
+		self.stream.write(get_reply(is_failed = True), callback = stack_context.wrap(self.close))
 
 	def clear_request_state(self):
 		"""Clears the per-request state.
 		"""
-		self._write_callback = None
 		self._close_callback = None
 
 	def set_close_callback(self, callback):
@@ -144,30 +116,15 @@ class TornadoTCPConnection(object):
 		if self.timeout_handle is not None:
 			self.io_loop.remove_timeout(self.timeout_handle)
 			self.timeout_handle = None
-			print('here_on_connection_close')
 		if self._close_callback is not None:
 			callback = self._close_callback
 			self._close_callback = None
 			callback()
 		self.clear_request_state()
-		logging.info("{}:{} disconnect".format(self.address[0], self.address[1]))
+		logging.info("{}: disconnect".format(self.address_string))
 
 	def close(self):
 		self.stream.close()
-		self.clear_request_state()
-
-	def write(self, chunk, callback=None):
-		"""Writes a chunk of output to the stream."""
-		if not self.stream.closed():
-			self._write_callback = stack_context.wrap(callback)
-			self.stream.write(chunk, self.on_write_complete)
-
-	def on_write_complete(self):
-		if self._write_callback is not None:
-			print('here_on_write_complete')
-			callback = self._write_callback
-			self._write_callback = None
-			callback()
 
 
 def main():
