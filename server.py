@@ -1,24 +1,17 @@
 #!/usr/bin/env python   
 # -*- coding:utf-8 -*-
 
-import os
-import time
 import json
-import redis
 import tornado
 import logging
 import argparse
 import commons.macro
-from tornado import gen
-from tornado import ioloop
-from tornado import stack_context
-from tornado.escape import native_str
+from tornado import gen, ioloop, stack_context
 from tornado.tcpserver import TCPServer
-from tools.db_tools import database_resource
-from tools.log_tools import get_log_file_handler
+from tools import *
 from concurrent.futures import ThreadPoolExecutor
+from redis_cache import producer
 
-MAX_WORKERS = 6
 
 class DataCollectionServer(TCPServer):
 	def __init__(self, io_loop=None, **kwargs):
@@ -29,7 +22,8 @@ class DataCollectionServer(TCPServer):
 
 
 class TornadoTCPConnection(object):
-	executor = ThreadPoolExecutor(max_workers=MAX_WORKERS)
+	MAX_WORKERS = 10
+	executor = ThreadPoolExecutor(max_workers=self.MAX_WORKERS)
 
 	def __init__(self, stream, address, io_loop):
 		print('Connected!!!!')
@@ -75,14 +69,13 @@ class TornadoTCPConnection(object):
 				self.on_error_request()
 		except Exception as e:
 			print(e)
-			self.stream.read_bytes(num_bytes = 512, callback=stack_context.wrap(self.on_message_receive), partial=True)
+			self.on_error_request()
 
 	def on_error_request(self):
 		send_back = {'method':'failed','ts':int(time.time())}
 		self.write(json.dumps(send_back), callback = stack_context.wrap(self.close))
 
 	def on_push_data_request(self, request):
-		redis_connection = redis.StrictRedis()
 		device_config_id = request['device_config_id']
 		for k, v in request['package'].iteritems():
 			tmp_data = {}
@@ -91,9 +84,8 @@ class TornadoTCPConnection(object):
 			tmp_data['device_config_id'] = device_config_id
 			tmp_data['data'] = v
 			tmp_data['ts'] = int(k)
-			redis_connection.lpush(macro.REDIS_LIST_KEY, json.dumps(tmp_data))
+			producer.insert_into_redis(tmp_data)
 		reply_data = {'device_id':self.device_id, 'method':'data_uploaded', 'ts':int(time.time())}
-		# self.write(self.encoder.encode(reply_data), callback = stack_context.wrap(self.close))
 		self.write(json.dumps(reply_data), callback = stack_context.wrap(self.close))
 
 	def on_pull_param_request(self):
@@ -128,17 +120,12 @@ class TornadoTCPConnection(object):
 		self.stream.read_bytes(num_bytes = self.image_size, callback=stack_context.wrap(self.on_image_upload_complete), partial=False)
 
 	def on_image_upload_complete(self, data):
-		redis_connection = redis.StrictRedis()
-		file_path = os.path.abspath('./images/%s'%(self.device_id))
-		if not os.path.exists(file_path):
-			os.mkdir(file_path)
-		url = os.path.join(file_path, '%s.jpg'%(str(self.image_acquisition_time)))
+		filepath = check_device_img_file(self.device_id)
+		url = get_image_url_local(filepath, self.image_acquisition_time)
+		save_img_local(data, url)
 		image_value = {self.image_key:{'url':url}}
 		tmp_data = {'type':'image', 'device_id':self.device_id, 'device_config_id':self.device_config_id, 'data':image_value, 'ts':self.image_acquisition_time}
-		redis_connection.lpush(macro.REDIS_LIST_KEY, json.dumps(tmp_data))
-		# image save operation
-		with open(url, 'wb') as pen:
-			pen.write(data)
+		producer.insert_into_redis(tmp_data)
 		reply_data = {'device_id':self.device_id, 'method':'image_uploaded', 'ts':int(time.time())}
 		self.write(json.dumps(reply_data), callback=stack_context.wrap(self.close))
 
@@ -199,5 +186,5 @@ if __name__ == "__main__":
 	try:
 		main()
 	except Exception as ex:
-		print ("Ocurred Exception: %s" % str(ex))
+		print ("ocurred Exception: %s" % str(ex))
 		quit()

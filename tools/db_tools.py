@@ -2,7 +2,7 @@
 # coding=utf-8
 
 import mysql.connector
-from commons.marco import *
+from commons.macro import *
 
 def create_engine(user, password, database, host = '127.0.0.1', port = 3306, **kw):
     params = dict(user = user, password = password, database = database, host = host, port = port)
