@@ -3,11 +3,14 @@
 
 import os
 
+# should be called in the project root catalog
 def check_device_img_file(device_id, create_if_noexists = True):
+	if not isinstance(device_id, str):
+		device_id = str(device_id)
 	filepath = os.path.abspath('./images/%s'%(device_id))
 	if not os.path.exists(filepath):
 		if create_if_noexists:
-			os.mkdir(file_path)
+			os.mkdir(filepath)
 	return filepath
 
 def get_image_url_local(filepath, image_acquisition_time):
@@ -16,3 +19,9 @@ def get_image_url_local(filepath, image_acquisition_time):
 
 def get_image_url_server():
 	pass
+
+if __name__ == '__main__':
+	filepath = check_device_img_file(3, create_if_noexists = False)
+	print filepath
+	url = get_image_url_local(filepath, 123)
+	print url

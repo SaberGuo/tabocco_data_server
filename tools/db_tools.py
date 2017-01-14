@@ -1,8 +1,11 @@
 #!/usr/bin/env python
 # coding=utf-8
 
+import sys
 import json
+import random
 import mysql.connector
+sys.path.append('../')
 from commons.macro import *
 from tools.common_tools import get_current_ts
 
@@ -32,22 +35,117 @@ class database_resource:
         self.cursor.close()
         self.conn.close()
 
-def get_latest_device_config(device_id):
+def get_latest_device_config_json(device_id):
     try:
         param = {}
         with database_resource() as cursor:
-            sql = 'select `%s`, `%s` from `%s` where `%s` = `%s` order by id desc'%('id', 'data', 'device_config', 'device_id', device_id)
+            sql = 'select `%s`, `%s`, `%s` from `%s` where `%s` = %d order by id desc'%('id', 'config', 'control', 'device_config', 'device_id', device_id)
             cursor.execute(sql)
             value = cursor.fetchone()
             device_config_id = value[0]
-            data = json.loads(value[1])
+            config = json.loads(value[1])
+            control = json.loads(value[2])
             param['device_id'] = device_id
             param['device_config_id'] = device_config_id
             param['method'] = 'push_param'
-            param['config'] = data['config']
-            param['control'] = data['control']
+            param['config'] = config
+            param['control'] = control
             param['ts'] = get_current_ts()
         return json.dumps(param)
     except Exception as e:
         print e
         return None
+
+def save_json_data(json_data):
+    dict_data = json.loads(json_data)
+    db_name = ''
+    with database_resource() as cursor:
+        if dict_data['type'] == 'image':
+            db_name = 'device_image'        
+        else:
+            db_name = 'device_data'
+        sql = "insert into `%s` (`device_id`, `device_config_id`, `ts`, `data`) values \
+                    (%d, %d, '%s', '%s')"%(db_name, dict_data['device_id'], dict_data['device_config_id'], dict_data['ts'], json.dumps(dict_data['data']))
+        cursor.execute(sql)
+
+def _save_device_config(data):
+    device_id = data['device_id']
+    config = json.dumps(data['config'])
+    control = json.dumps(data['control'])
+    with database_resource() as cursor:
+        sql = "insert into `%s` (`device_id`, `config`, `control`) \
+        values (%d, '%s', '%s')"%('device_config' ,device_id, config, control)
+        cursor.execute(sql)
+
+if __name__ == '__main__':
+    # control = {
+    #     "img_capture_invl": "*/30 * * * *",
+    #     "img_upload_invl": "*/30 * * * *",
+    #     "data_capture_invl": "*/30 * * * *",
+    #     "data_upload_invl": "*/30 * * * *"
+    # }
+    # config = {
+    #     "t_30": {
+    #         "port": "AD1",
+    #         "unit": "x",
+    #         "type": "temperature",
+    #         "desc": "30depth temperature"
+    #     },
+    #     "t_10": {
+    #         "port": "AD2",
+    #         "unit": "x",
+    #         "type": "temperature",
+    #         "desc": "10depth temperature"
+    #     }
+    # }
+    control = {
+        'img_capture_invl': '*/30 * * * *',
+        'img_upload_invl': '*/30 * * * *',
+        'data_capture_invl': '*/30 * * * *',
+        'data_upload_invl': '*/30 * * * *'
+    }
+    config = {
+        't_30': {
+            'port': 'AD1',
+            'unit': 'x',
+            'type': 'temperature',
+            'desc': '30depth temperature'
+        },
+        't_10': {
+            'port': 'AD2',
+            'unit': 'x',
+            'type': 'temperature',
+            'desc': '10depth temperature'
+        }
+    }
+    device_config_data_to_save = {
+        'device_id': random.randint(0,100),
+        'config': config,
+        'control': control
+    }
+    _save_device_config(device_config_data_to_save)
+    device_config_data_query = get_latest_device_config_json(50)
+    print device_config_data_query
+    # json_data_to_save = json.dumps({
+    #     "type": "data",
+    #     "device_config_id": 1,
+    #     "device_id": 1,
+    #     "data": {
+    #         "t_30": {
+    #             "value": 5
+    #         }
+    #     },
+    #     "ts": "2017-01-07 16:33:54"
+    # })
+    json_data_to_save = json.dumps({
+        'type': 'data',
+        'device_config_id': 1,
+        'device_id': 1,
+        'data': {
+            't_30': {
+                'value': 5
+            }
+        },
+        'ts': '2017-01-07 16:33:54'
+    })
+    save_json_data(json_data_to_save)

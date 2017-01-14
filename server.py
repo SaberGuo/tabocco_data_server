@@ -67,12 +67,12 @@ class TornadoTCPConnection(object):
 		for ts, data in request['package'].iteritems():
 			flag = flag or (producer.insert_into_redis(get_data_to_save(request, ts, data), REDIS_LIST_KEY))
 		if flag:
-			self.stream.write(get_reply(self.json_request), callback = stack_context.wrap(self.close))
+			self.stream.write(get_reply_json(self.json_request), callback = stack_context.wrap(self.close))
 		else:
 			self.on_error_request()
 
 	def on_pull_param_request(self, request):
-		param = get_latest_device_config(request['device_id'])
+		param = get_latest_device_config_json(request['device_id'])
 		if param:
 			self.stream.write(param, callback=stack_context.wrap(self.wait_push_param_reply))
 		else:
@@ -82,7 +82,7 @@ class TornadoTCPConnection(object):
 		self.stream.read_bytes(num_bytes = 512, callback=stack_context.wrap(self.on_message_receive), partial=True)
 
 	def on_push_image_request(self, request):
-		self.stream.write(get_reply(self.json_request), callback = stack_context.wrap(self.start_receive_image_data))
+		self.stream.write(get_reply_json(self.json_request), callback = stack_context.wrap(self.start_receive_image_data))
 
 	def start_receive_image_data(self):
 		self.json_request['method'] = 'pushing_image'
@@ -95,12 +95,12 @@ class TornadoTCPConnection(object):
 		self.json_request['image_info'] = {self.json_request['key']:{'url':url}}
 		tmp_data = get_image_info_to_save(self.json_request)
 		if producer.insert_into_redis(tmp_data, REDIS_LIST_KEY):
-			self.stream.write(get_reply(self.json_request), callback=stack_context.wrap(self.close))
+			self.stream.write(get_reply_json(self.json_request), callback=stack_context.wrap(self.close))
 		else:
 			self.on_error_request()
 
 	def on_error_request(self):
-		self.stream.write(get_reply(is_failed = True), callback = stack_context.wrap(self.close))
+		self.stream.write(get_reply_json(is_failed = True), callback = stack_context.wrap(self.close))
 
 	def clear_request_state(self):
 		"""Clears the per-request state.

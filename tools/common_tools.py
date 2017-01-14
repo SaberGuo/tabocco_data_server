@@ -20,3 +20,9 @@ def get_datetime_str_from_ts(ts):
 
 def string2json(string):
 	pass
+
+if __name__ == '__main__':
+	ts = get_current_ts()
+	print ts
+	print get_datetime_str_from_ts(ts)
+	print get_datetime_str_from_ts(str(ts))

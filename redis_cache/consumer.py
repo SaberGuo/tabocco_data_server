@@ -1,34 +1,27 @@
 #!/usr/bin/env python   
 # -*- coding:utf-8 -*-
 
+import sys
 import json
 import redis
-import commons.macro
 import argparse
-from tools.db_tools import database_resource
+sys.path.append('../')
+from commons.macro import *
+from tools.db_tools import save_json_data
 
 class RedisConsumer(object):
 	"""docstring for RedisConsumer"""
 	def __init__(self, db=None, key=None, host='localhost', port=6379):
 		super(RedisConsumer, self).__init__()
-		self.redis_connection = redis.StrictRedis(host=host, port=port, db=db if db else macro.REDIS_DB_NUM)
-		self.key = key if key else macro.REDIS_LIST_KEY
+		# self.redis_connection = redis.StrictRedis(host=host, port=port, db=db if db else REDIS_DB_NUM)
+		self.redis_connection = redis.StrictRedis(host=host, port=port)
+		self.key = key if key else REDIS_LIST_KEY
 
 	def start(self):
 		while True:
 			item=self.redis_connection.blpop(self.key)
-			data = json.loads(item[1])
-			sql = ''
-			db_name = ''
-			with database_resource() as cursor:
-				if data['type'] = 'image':
-					db_name = 'device_image'
-					
-				else:
-					db_name = 'device_data'
-				sql = "insert into `%s` (`device_id`, `device_config_id`, `ts`, `data`) values \
-					('%s', %d, '%s', '%s')"%(db_name, data['device_id'], data['device_config_id'], data['ts'], json.dumps(data['data']))
-				cursor.execute(sql)
+			json_data = item[1]
+			save_json_data(json_data)
 
 
 if __name__ == '__main__':
