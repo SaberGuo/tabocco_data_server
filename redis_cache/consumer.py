@@ -16,10 +16,12 @@ class RedisConsumer(object):
 		# self.redis_connection = redis.StrictRedis(host=host, port=port, db=db if db else REDIS_DB_NUM)
 		self.redis_connection = redis.StrictRedis(host=host, port=port)
 		self.key = key if key else REDIS_LIST_KEY
+		print(self.key)
 
 	def start(self):
 		while True:
 			item=self.redis_connection.blpop(self.key)
+			print('here')
 			json_data = item[1]
 			save_json_data(json_data)
 

@@ -24,10 +24,11 @@ def get_reply_json(request = None, is_failed = False):
 				reply['method'] = 'image_uploaded'
 		return json.dumps(reply)
 	except Exception as e:
-		print e
+		print(e)
 		return json.dumps({'method':'failed','ts':get_current_ts()})
 
 def get_data_to_save(request, ts, data):
+	print('get_data_to_save')
 	try:
 		tmp_data = {}
 		tmp_data['type'] = 'data'
@@ -37,7 +38,7 @@ def get_data_to_save(request, ts, data):
 		tmp_data['ts'] = get_datetime_str_from_ts(ts)
 		return tmp_data
 	except Exception as e:
-		print e
+		print(e)
 		return None
 
 def get_image_info_to_save(request):
@@ -53,15 +54,15 @@ def get_image_info_to_save(request):
 		else:
 			return None
 	except Exception as e:
-		print e
+		print(e)
 		return None
 
 if __name__ == '__main__':
 	# get_reply_json
-	print get_reply_json(is_failed = True)
-	print get_reply_json({"method": "push_data", "device_id": 1})
-	print get_reply_json({"method": "push_image", "device_id": 1})
-	print get_reply_json({"method": "pushing_image", "device_id": 1})
+	print(get_reply_json(is_failed = True))
+	print(get_reply_json({"method": "push_data", "device_id": 1}))
+	print(get_reply_json({"method": "push_image", "device_id": 1}))
+	print(get_reply_json({"method": "pushing_image", "device_id": 1}))
 	# get_data_to_save
 	request = {
 		'device_id': 1,

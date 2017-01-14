@@ -12,7 +12,7 @@ from tools.common_tools import get_current_ts
 def create_engine(user, password, database, host = '127.0.0.1', port = 3306, **kw):
     params = dict(user = user, password = password, database = database, host = host, port = port)
     defaults = dict(use_unicode = True, charset = 'utf8', collation = 'utf8_general_ci', autocommit = False)
-    for k, v in defaults.iteritems():
+    for k, v in defaults.items():
         params[k] = kw.pop(k, v)
     params.update(kw)
     params['buffered'] = True
@@ -53,7 +53,7 @@ def get_latest_device_config_json(device_id):
             param['ts'] = get_current_ts()
         return json.dumps(param)
     except Exception as e:
-        print e
+        print(e)
         return None
 
 def save_json_data(json_data):
@@ -125,7 +125,7 @@ if __name__ == '__main__':
     }
     _save_device_config(device_config_data_to_save)
     device_config_data_query = get_latest_device_config_json(50)
-    print device_config_data_query
+    print(device_config_data_query)
     # json_data_to_save = json.dumps({
     #     "type": "data",
     #     "device_config_id": 1,
