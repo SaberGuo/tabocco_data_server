@@ -145,7 +145,7 @@ def main():
 	args = parser.parse_args()
 	logging.basicConfig(level=logging.INFO)
 	log = logging.getLogger()
-	log.addHandler(get_log_file_handler("port:" + str(args.port)))
+	log.addHandler(get_log_file_handler("port:" + str(args.port) + ".log"))
 	server = DataCollectionServer()
 	server.listen(args.port)
 	ioloop.IOLoop.instance().start()

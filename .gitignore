@@ -1,5 +1,6 @@
 *.pyc
 *.conf
+*.log
 macro.py
 test.py
 /__pycache__/
