@@ -26,10 +26,20 @@ class TCPClient(object):
 		self.stream.connect((self.host, self.port), self.send_message)
 	def on_receive(self, data):
 		# message = json.loads(data)
-		message = native_str(data.decode('UTF-8'))
-		print("Received: %s"%(message))
+		json_message = native_str(data.decode('UTF-8'))
+		print("Received: %s"%(json_message))
+		dict_message = json.loads(json_message)
+		if dict_message['method'] == 'push_param':
+			print('param_updated')
+			message = {
+				'device_id': 65,
+				'method': 'param_updated'
+			}
+			data = json.dumps(message)
+			self.stream.write(str.encode(data))
 		# logging.info("Received: %s", message)
-		self.stream.close()
+		else:
+			self.stream.close()
 	def on_close(self):
 		if self.shutdown:
 			self.io_loop.stop()
@@ -38,14 +48,14 @@ class TCPClient(object):
 		# message = {
 		# 	"device_id": 100,
 		# 	"device_config_id": 100,
-		#	"method": "push_image",
+		# 	"method": "push_image",
 		# 	"key": 'etateetawetwe',
 		# 	"size": 2048,
 		# 	'acquisition_time': 1479798416
 		# }
 
 		# message = {
-		# 	'device_id': 1,
+		# 	'device_id': 65,
 		# 	"method": 'pull_param'
 		# }
 

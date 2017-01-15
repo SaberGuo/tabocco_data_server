@@ -39,16 +39,16 @@ def get_latest_device_config_json(device_id):
     try:
         param = {}
         with database_resource() as cursor:
-            sql = 'select `%s`, `%s`, `%s` from `%s` where `%s` = %d order by id desc'%('id', 'config', 'control', 'device_config', 'device_id', device_id)
+            sql = 'select `%s`, `%s`, `%s` from `%s` where `%s` = %d order by id desc'%('id', 'data', 'control', 'device_config', 'device_id', device_id)
             cursor.execute(sql)
             value = cursor.fetchone()
             device_config_id = value[0]
-            config = json.loads(value[1])
+            data = json.loads(value[1])
             control = json.loads(value[2])
             param['device_id'] = device_id
             param['device_config_id'] = device_config_id
             param['method'] = 'push_param'
-            param['config'] = config
+            param['config'] = data
             param['control'] = control
             param['ts'] = get_current_ts()
         return json.dumps(param)
@@ -61,7 +61,8 @@ def save_json_data(json_data):
     db_name = ''
     with database_resource() as cursor:
         if dict_data['type'] == 'image':
-            db_name = 'device_image'        
+            db_name = 'device_data'
+            # db_name = 'device_image'
         else:
             db_name = 'device_data'
         sql = "insert into `%s` (`device_id`, `device_config_id`, `ts`, `data`) values \
@@ -73,7 +74,7 @@ def _save_device_config(data):
     config = json.dumps(data['config'])
     control = json.dumps(data['control'])
     with database_resource() as cursor:
-        sql = "insert into `%s` (`device_id`, `config`, `control`) \
+        sql = "insert into `%s` (`device_id`, `data`, `control`) \
         values (%d, '%s', '%s')"%('device_config' ,device_id, config, control)
         cursor.execute(sql)
 
@@ -98,25 +99,29 @@ if __name__ == '__main__':
     #         "desc": "10depth temperature"
     #     }
     # }
-    control = {
-        'img_capture_invl': '*/30 * * * *',
-        'img_upload_invl': '*/30 * * * *',
-        'data_capture_invl': '*/30 * * * *',
-        'data_upload_invl': '*/30 * * * *'
-    }
     config = {
         't_30': {
             'port': 'AD1',
             'unit': 'x',
             'type': 'temperature',
-            'desc': '30depth temperature'
+            'desc': '30depth temperature',
+            'max_v': 100,
+            'min_v': 0
         },
         't_10': {
             'port': 'AD2',
             'unit': 'x',
             'type': 'temperature',
-            'desc': '10depth temperature'
+            'desc': '10depth temperature',
+            'max_v': 100,
+            'min_v': 0
         }
+    }
+    control = {
+        'img_capture_invl': '*/30 * * * *',
+        'img_upload_invl': '*/30 * * * *',
+        'data_capture_invl': '*/30 * * * *',
+        'data_upload_invl': '*/30 * * * *'
     }
     device_config_data_to_save = {
         'device_id': random.randint(0,100),
@@ -124,7 +129,7 @@ if __name__ == '__main__':
         'control': control
     }
     _save_device_config(device_config_data_to_save)
-    device_config_data_query = get_latest_device_config_json(50)
+    device_config_data_query = get_latest_device_config_json(65)
     print(device_config_data_query)
     # json_data_to_save = json.dumps({
     #     "type": "data",

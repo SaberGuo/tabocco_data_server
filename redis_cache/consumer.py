@@ -20,10 +20,14 @@ class RedisConsumer(object):
 
 	def start(self):
 		while True:
-			item=self.redis_connection.blpop(self.key)
-			print('here')
-			json_data = item[1]
-			save_json_data(json_data)
+			try:
+				item=self.redis_connection.blpop(self.key)
+				print('consumer receive data!')
+				json_data = item[1]
+				save_json_data(json_data)
+			except Exception as ex:
+				print(ex)
+				pass
 
 
 if __name__ == '__main__':
