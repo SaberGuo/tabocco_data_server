@@ -9,8 +9,12 @@ def get_current_ts():
 
 def get_datetime_str_from_ts(ts):
 	try:
-		if not isinstance(ts, int):
-			ts = int(ts)
+		if isinstance(ts, float):
+			ts = str(ts)
+			ts = int(ts.split('.')[0])
+		elif isinstance(ts, str):
+			ts = int(ts.split('.')[0])
+			# ts = int(ts)
 		dt = datetime.datetime.fromtimestamp(ts)
 		dt_str = dt.strftime('%Y-%m-%d %H:%M:%S')
 		return dt_str

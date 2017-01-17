@@ -8,7 +8,6 @@ from commons.macro import *
 from tools.server_tools import *
 
 def insert_into_redis(data, key):
-	print(key)
 	try:
 		if data:
 			redis_connection = redis.StrictRedis()

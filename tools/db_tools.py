@@ -37,6 +37,8 @@ class database_resource:
 
 def get_latest_device_config_json(device_id):
     try:
+        if not isinstance(device_id, int):
+            device_id = int(device_id)
         param = {}
         with database_resource() as cursor:
             sql = 'select `%s`, `%s`, `%s` from `%s` where `%s` = %d order by id desc'%('id', 'data', 'control', 'device_config', 'device_id', device_id)
@@ -44,7 +46,9 @@ def get_latest_device_config_json(device_id):
             value = cursor.fetchone()
             device_config_id = value[0]
             data = json.loads(value[1])
+            print(type(data))
             control = json.loads(value[2])
+            print(type(control))
             param['device_id'] = device_id
             param['device_config_id'] = device_config_id
             param['method'] = 'push_param'
@@ -53,21 +57,32 @@ def get_latest_device_config_json(device_id):
             param['ts'] = get_current_ts()
         return json.dumps(param)
     except Exception as e:
+        # print('here')
         print(e)
         return None
 
 def save_json_data(json_data):
-    dict_data = json.loads(json_data)
-    db_name = ''
-    with database_resource() as cursor:
-        if dict_data['type'] == 'image':
-            db_name = 'device_data'
-            # db_name = 'device_image'
-        else:
-            db_name = 'device_data'
-        sql = "insert into `%s` (`device_id`, `device_config_id`, `ts`, `data`) values \
-                    (%d, %d, '%s', '%s')"%(db_name, dict_data['device_id'], dict_data['device_config_id'], dict_data['ts'], json.dumps(dict_data['data']))
-        cursor.execute(sql)
+    try:
+        print(json_data)
+        dict_data = json.loads(json_data)
+        print(dict_data)
+        if not isinstance(dict_data['device_id']):
+            dict_data['device_id'] = int(dict_data['device_id'])
+        if not isinstance(dict_data['device_config_id']):
+            dict_data['device_config_id'] = int(dict_data['device_config_id'])
+        db_name = ''
+        with database_resource() as cursor:
+            if dict_data['type'] == 'image':
+                db_name = 'device_data'
+                # db_name = 'device_image'
+            else:
+                db_name = 'device_data'
+            sql = "insert into `%s` (`device_id`, `device_config_id`, `ts`, `data`) values \
+                        (%d, %d, '%s', '%s')"%(db_name, dict_data['device_id'], dict_data['device_config_id'], dict_data['ts'], json.dumps(dict_data['data']))
+            cursor.execute(sql)
+    except Exception as ex:
+        print(ex)
+
 
 def _save_device_config(data):
     device_id = data['device_id']
@@ -153,4 +168,5 @@ if __name__ == '__main__':
         },
         'ts': '2017-01-07 16:33:54'
     })
+
     save_json_data(json_data_to_save)
