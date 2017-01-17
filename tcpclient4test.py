@@ -8,6 +8,10 @@ import tornado.ioloop
 import tornado.iostream
 import socket
 import json
+import os
+
+file_path = '/home/sonic513/10630a450941b72c1c1357b302f56c18.jpg'
+file_size = os.path.getsize(file_path)
 
 class TCPClient(object):
 	def __init__(self, host, port, io_loop=None):
@@ -37,7 +41,14 @@ class TCPClient(object):
 			}
 			data = json.dumps(message)
 			self.stream.write(str.encode(data))
-		# logging.info("Received: %s", message)
+		if dict_message['method'] == 'push_image_ready':
+			global file_path
+			global file_size
+			tmp_img_data = None
+			with open(file_path, 'rb') as reader:
+				tmp_img_data = reader.read(file_size)
+			self.stream.write(tmp_img_data)
+			self.stream.read_bytes(num_bytes = 512, callback = self.on_receive, partial=True)
 		else:
 			self.stream.close()
 	def on_close(self):
@@ -45,13 +56,14 @@ class TCPClient(object):
 			self.io_loop.stop()
 	def send_message(self):
 		logging.info("Send message....")
+		global file_size
 		# message = {
 		# 	"device_id": 100,
 		# 	"device_config_id": 100,
 		# 	"method": "push_image",
 		# 	"key": 'etateetawetwe',
-		# 	"size": 2048,
-		# 	'acquisition_time': 1479798416
+		# 	"size": file_size,
+		# 	'acquisition_time': 1479798800
 		# }
 
 		# message = {

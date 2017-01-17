@@ -5,18 +5,20 @@ import json
 import tornado
 import logging
 import argparse
+from tools import *
 from commons.macro import *
+from redis_cache import producer
 from tornado import gen, ioloop, stack_context
 from tornado.escape import native_str
 from tornado.tcpserver import TCPServer
-from tools import *
+from tornado.concurrent import run_on_executor
 from concurrent.futures import ThreadPoolExecutor
-from redis_cache import producer
 # from functools import wraps
 # import sys
 # from imp import reload
 # reload(sys)
 # sys.setdefaultencoding('utf-8')
+import time
 
 
 # def handler_exception(handle_func):
@@ -41,7 +43,7 @@ class DataCollectionServer(TCPServer):
 
 
 class TornadoTCPConnection(object):
-	MAX_SIZE = 10 * 1024 #512KB
+	MAX_SIZE = 10 * 1024 #10KB
 	MAX_WORKERS = 10
 	executor = ThreadPoolExecutor(max_workers=MAX_WORKERS)
 
@@ -104,7 +106,7 @@ class TornadoTCPConnection(object):
 			print(e)
 			self.on_error_request()
 			
-
+	@run_on_executor
 	def on_pull_param_request(self, request):
 		param = get_latest_device_config_json(request['device_id'])
 		if param:
@@ -120,9 +122,10 @@ class TornadoTCPConnection(object):
 
 	def start_receive_image_data(self):
 		self.json_request['method'] = 'pushing_image'
-		self.stream.read_bytes(num_bytes = self.json_request['size'] * 1024, callback=stack_context.wrap(self.on_image_upload_complete), partial=False)
+		self.stream.read_bytes(num_bytes = self.json_request['size'], callback=stack_context.wrap(self.on_image_upload_complete), partial=False)
 
 	# @handler_exception(self.on_error_request)
+	@run_on_executor
 	def on_image_upload_complete(self, data):
 		filepath = check_device_img_file(self.json_request['device_id'])
 		url = get_image_url_local(filepath, self.json_request['acquisition_time'])
