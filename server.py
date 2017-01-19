@@ -53,7 +53,7 @@ class TornadoTCPConnection(object):
 		self.timeout_handle = self.io_loop.add_timeout(self.io_loop.time() + TCP_CONNECTION_TIMEOUT, stack_context.wrap(self.on_timeout))
 		self.stream.read_bytes(num_bytes = TornadoTCPConnection.MAX_SIZE, callback=stack_context.wrap(self.on_message_receive), partial=True)
 
-	def wait_next_image_reqeust(self):
+	def wait_new_reqeust(self):
 		self.stream.read_bytes(num_bytes = TornadoTCPConnection.MAX_SIZE, callback=stack_context.wrap(self.on_message_receive), partial=True)
 
 	def on_timeout(self):
@@ -92,6 +92,7 @@ class TornadoTCPConnection(object):
 	def on_push_data_request(self, request):
 		for ts, data in request['package'].items():
 			producer.insert_into_redis(get_data_to_save(request, ts, data), REDIS_LIST_KEY)
+		# self.stream.write(str.encode(get_reply_json(self.json_request)), callback = stack_context.wrap(self.wait_new_reqeust))
 		self.stream.write(str.encode(get_reply_json(self.json_request)), callback = stack_context.wrap(self.close))
 			
 	@run_on_executor
@@ -110,6 +111,7 @@ class TornadoTCPConnection(object):
 
 	def start_receive_image_data(self):
 		self.json_request['method'] = 'pushing_image'
+		print('start_receive_image_data')
 		self.stream.read_bytes(num_bytes = self.json_request['size'], callback=stack_context.wrap(self.on_image_upload_complete), partial=False)
 
 	@run_on_executor
@@ -122,7 +124,7 @@ class TornadoTCPConnection(object):
 			tmp_data = get_image_info_to_save(self.json_request)
 			if producer.insert_into_redis(tmp_data, REDIS_LIST_KEY):
 				# self.stream.write(str.encode(get_reply_json(self.json_request)), callback=stack_context.wrap(self.close))
-				self.stream.write(str.encode(get_reply_json(self.json_request)), callback=stack_context.wrap(self.wait_next_image_reqeust))
+				self.stream.write(str.encode(get_reply_json(self.json_request)), callback=stack_context.wrap(self.wait_new_reqeust))
 			else:
 				self.on_error_request()
 		except Exception as ex:
@@ -130,6 +132,7 @@ class TornadoTCPConnection(object):
 			self.on_error_request()
 
 	def on_error_request(self):
+		# self.stream.write(str.encode(get_reply_json(is_failed = True)), callback = stack_context.wrap(self.wait_new_reqeust))
 		self.stream.write(str.encode(get_reply_json(is_failed = True)), callback = stack_context.wrap(self.close))
 
 	def clear_request_state(self):

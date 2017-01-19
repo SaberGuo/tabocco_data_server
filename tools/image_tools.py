@@ -4,6 +4,7 @@
 # from PIL import Image
 
 def save_image_local(data, url):
+	print('save_image_local')
 	with open(url, 'wb') as pen:
 		pen.write(data)
 
