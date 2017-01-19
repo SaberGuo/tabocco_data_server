@@ -6,6 +6,7 @@ from tornado.escape import native_str
 import pdb, time, logging
 import tornado.ioloop
 import tornado.iostream
+import logging
 import socket
 import json
 import os
@@ -31,10 +32,12 @@ class TCPClient(object):
 	def on_receive(self, data):
 		# message = json.loads(data)
 		json_message = native_str(data.decode('UTF-8'))
-		print("Received: %s"%(json_message))
+		logging.info("Received: %s"%(json_message))
+		# print("Received: %s"%(json_message))
 		dict_message = json.loads(json_message)
 		if dict_message['method'] == 'push_param':
-			print('param_updated')
+			logging.info('param_updated')
+			# print('param_updated')
 			message = {
 				'device_id': 65,
 				'method': 'param_updated'
@@ -109,6 +112,7 @@ def main():
 if __name__ == "__main__":
 	try:
 		main()
-	except Exception as ex:
-		print("Ocurred Exception: %s" % str(ex))
+	except Exception as e:
+		logging.info("Ocurred Exception: %s" % str(e))
+		# print("Ocurred Exception: %s" % str(e))
 		quit()

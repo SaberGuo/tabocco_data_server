@@ -4,6 +4,7 @@
 import sys
 import json
 import random
+import logging
 import mysql.connector
 sys.path.append('../')
 from commons.macro import *
@@ -46,9 +47,7 @@ def get_latest_device_config_json(device_id):
             value = cursor.fetchone()
             device_config_id = value[0]
             data = json.loads(value[1])
-            print(type(data))
             control = json.loads(value[2])
-            print(type(control))
             param['device_id'] = device_id
             param['device_config_id'] = device_config_id
             param['method'] = 'push_param'
@@ -57,15 +56,13 @@ def get_latest_device_config_json(device_id):
             param['ts'] = get_current_ts()
         return json.dumps(param)
     except Exception as e:
-        # print('here')
-        print(e)
+        logging.info(e)
+        # print(e)
         return None
 
 def save_json_data(json_data):
     try:
-        print(json_data)
         dict_data = json.loads(json_data)
-        print(dict_data)
         if not isinstance(dict_data['device_id']):
             dict_data['device_id'] = int(dict_data['device_id'])
         if not isinstance(dict_data['device_config_id']):
@@ -80,8 +77,10 @@ def save_json_data(json_data):
             sql = "insert into `%s` (`device_id`, `device_config_id`, `ts`, `data`) values \
                         (%d, %d, '%s', '%s')"%(db_name, dict_data['device_id'], dict_data['device_config_id'], dict_data['ts'], json.dumps(dict_data['data']))
             cursor.execute(sql)
-    except Exception as ex:
-        print(ex)
+    except Exception as e:
+        logging.info(e)
+        # print(e)
+        pass
 
 
 def _save_device_config(data):

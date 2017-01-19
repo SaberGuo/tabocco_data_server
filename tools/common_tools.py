@@ -2,6 +2,7 @@
 # -*- coding:utf-8 -*-
 
 import time
+import logging
 import datetime
 
 def get_current_ts():
@@ -19,7 +20,8 @@ def get_datetime_str_from_ts(ts):
 		dt_str = dt.strftime('%Y-%m-%d %H:%M:%S')
 		return dt_str
 	except Exception as e:
-		print(e)
+		logging.inf(e)
+		# print(e)
 		return ''
 
 def string2json(string):

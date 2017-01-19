@@ -4,6 +4,7 @@
 import sys
 import redis
 import json
+import logging
 sys.path.append('../')
 from tools.common_tools import *
 from tools.db_tools import *
@@ -24,11 +25,11 @@ def get_reply_json(request = None, is_failed = False):
 				reply['method'] = 'image_uploaded'
 		return json.dumps(reply)
 	except Exception as e:
-		print(e)
+		logging.info(e)
+		# print(e)
 		return json.dumps({'method':'failed','ts':get_current_ts()})
 
 def get_data_to_save(request, ts, data):
-	print('get_data_to_save')
 	try:
 		tmp_data = {}
 		tmp_data['type'] = 'data'
@@ -38,7 +39,8 @@ def get_data_to_save(request, ts, data):
 		tmp_data['ts'] = get_datetime_str_from_ts(ts)
 		return tmp_data
 	except Exception as e:
-		print(e)
+		logging.info(e)
+		# print(e)
 		return None
 
 def get_image_info_to_save(request):
@@ -54,7 +56,8 @@ def get_image_info_to_save(request):
 		else:
 			return None
 	except Exception as e:
-		print(e)
+		logging.info(e)
+		# print(e)
 		return None
 
 if __name__ == '__main__':

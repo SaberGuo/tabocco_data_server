@@ -4,6 +4,7 @@
 import sys
 import json
 import redis
+import logging
 import argparse
 sys.path.append('../')
 from commons.macro import *
@@ -16,17 +17,18 @@ class RedisConsumer(object):
 		# self.redis_connection = redis.StrictRedis(host=host, port=port, db=db if db else REDIS_DB_NUM)
 		self.redis_connection = redis.StrictRedis(host=host, port=port)
 		self.key = key if key else REDIS_LIST_KEY
-		print(self.key)
 
 	def start(self):
 		while True:
 			try:
 				item=self.redis_connection.blpop(self.key)
-				print('consumer receive data!')
+				logging.info('consumer receive data!')
+				# print('consumer receive data!')
 				json_data = item[1]
 				save_json_data(json_data)
-			except Exception as ex:
-				print(ex)
+			except Exception as e:
+				logging.info(e)
+				# print(e)
 				pass
 
 
