@@ -23,12 +23,12 @@ class RedisConsumer(object):
 			try:
 				item=self.redis_connection.blpop(self.key)
 				logging.info('consumer receive data!')
-				# print('consumer receive data!')
+				print('consumer receive data!')
 				json_data = item[1]
 				save_json_data(json_data)
 			except Exception as e:
 				logging.info(e)
-				# print(e)
+				print(e)
 				pass
 
 

@@ -63,9 +63,9 @@ def get_latest_device_config_json(device_id):
 def save_json_data(json_data):
     try:
         dict_data = json.loads(json_data)
-        if not isinstance(dict_data['device_id']):
+        if not isinstance(dict_data['device_id'], int):
             dict_data['device_id'] = int(dict_data['device_id'])
-        if not isinstance(dict_data['device_config_id']):
+        if not isinstance(dict_data['device_config_id'], int):
             dict_data['device_config_id'] = int(dict_data['device_config_id'])
         db_name = ''
         with database_resource() as cursor:
@@ -77,9 +77,11 @@ def save_json_data(json_data):
             sql = "insert into `%s` (`device_id`, `device_config_id`, `ts`, `data`) values \
                         (%d, %d, '%s', '%s')"%(db_name, dict_data['device_id'], dict_data['device_config_id'], dict_data['ts'], json.dumps(dict_data['data']))
             cursor.execute(sql)
+            print('after execution')
+            logging.info('after execution')
     except Exception as e:
         logging.info(e)
-        # print(e)
+        print(e)
         pass
 
 

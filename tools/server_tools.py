@@ -37,6 +37,7 @@ def get_data_to_save(request, ts, data):
 		tmp_data['device_config_id'] = request['device_config_id']
 		tmp_data['data'] = data
 		tmp_data['ts'] = get_datetime_str_from_ts(ts)
+		# print(tmp_data)
 		return tmp_data
 	except Exception as e:
 		logging.info(e)

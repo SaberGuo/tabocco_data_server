@@ -10,6 +10,8 @@ def get_current_ts():
 
 def get_datetime_str_from_ts(ts):
 	try:
+		if isinstance(ts, unicode):
+			ts = str(ts)
 		if isinstance(ts, float):
 			ts = str(ts)
 			ts = int(ts.split('.')[0])
@@ -20,7 +22,7 @@ def get_datetime_str_from_ts(ts):
 		dt_str = dt.strftime('%Y-%m-%d %H:%M:%S')
 		return dt_str
 	except Exception as e:
-		logging.inf(e)
+		logging.info(e)
 		# print(e)
 		return ''
 
