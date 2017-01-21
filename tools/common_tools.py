@@ -1,17 +1,22 @@
 #!/usr/bin/env python   
 # -*- coding:utf-8 -*-
 
+import sys
 import time
 import logging
 import datetime
+
+is_python_3_5 = (sys.version[0:3] == '3.5')
 
 def get_current_ts():
 	return int(time.time())
 
 def get_datetime_str_from_ts(ts):
 	try:
-		if isinstance(ts, unicode):
-			ts = str(ts)
+		global is_python_3_5
+		if not is_python_3_5:
+			if isinstance(ts, unicode):
+				ts = str(ts)
 		if isinstance(ts, float):
 			ts = str(ts)
 			ts = int(ts.split('.')[0])

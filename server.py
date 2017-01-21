@@ -112,7 +112,11 @@ class TornadoTCPConnection(object):
 		self.stream.read_bytes(num_bytes = TornadoTCPConnection.MAX_SIZE, callback=stack_context.wrap(self.on_message_receive), partial=True)
 
 	def on_push_image_request(self, request):
-		self.stream.write(str.encode(get_reply_json(self.json_request)), callback = stack_context.wrap(self.start_receive_image_data))
+		num_bytes = self.json_request['size']
+		if isinstance(num_bytes, int) and num_bytes > 0: 
+			self.stream.write(str.encode(get_reply_json(self.json_request)), callback = stack_context.wrap(self.start_receive_image_data))
+		else:
+			self.on_error_request()
 
 	def start_receive_image_data(self):
 		self.json_request['method'] = 'pushing_image'

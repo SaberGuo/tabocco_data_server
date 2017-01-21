@@ -79,22 +79,22 @@ class TCPClient(object):
 			'device_config_id': 98,
 			'method': 'push_data',
 			'package': {
-				1484447927: {
-					'test1': {
-						'value': 1
-					},
-					'test2': {
-						'value': 2
-					}
-				},
-				'1479798417': {
-					'test3': {
-						'value': 3
-					},
-					'test4': {
-						'value': 4
-					}
-				}
+				# 1484447927: {
+				# 	'test1': {
+				# 		'value': 1
+				# 	},
+				# 	'test2': {
+				# 		'value': 2
+				# 	}
+				# },
+				# '1479798417': {
+				# 	'test3': {
+				# 		'value': 3
+				# 	},
+				# 	'test4': {
+				# 		'value': 4
+				# 	}
+				# }
 			}
 		}
 		data = json.dumps(message)
