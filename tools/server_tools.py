@@ -6,8 +6,10 @@ import redis
 import json
 import logging
 sys.path.append('../')
+from commons import macro
 from tools.common_tools import *
 from tools.db_tools import *
+from redis_cache import email_producer
 
 def get_reply_json(request = None, is_failed = False):
 	try:
@@ -23,10 +25,12 @@ def get_reply_json(request = None, is_failed = False):
 				reply['method'] = 'push_image_ready'
 			if method == 'pushing_image':
 				reply['method'] = 'image_uploaded'
-		return json.dumps(reply)
+		reply_str = json.dumps(reply)
+		email_producer.insert_into_redis(reply_str, macro.EMAIL_REDIS_LIST_KEY)
+		return reply_str
 	except Exception as e:
 		logging.info(e)
-		# print(e)
+		print(e)
 		return json.dumps({'method':'failed','ts':get_current_ts()})
 
 def get_data_to_save(request, ts, data):
@@ -41,6 +45,7 @@ def get_data_to_save(request, ts, data):
 		return tmp_data
 	except Exception as e:
 		logging.info(e)
+		email_producer.insert_into_redis(e, macro.EMAIL_REDIS_LIST_KEY)
 		# print(e)
 		return None
 
@@ -58,6 +63,7 @@ def get_image_info_to_save(request):
 			return None
 	except Exception as e:
 		logging.info(e)
+		email_producer.insert_into_redis(e, macro.EMAIL_REDIS_LIST_KEY)
 		# print(e)
 		return None
 

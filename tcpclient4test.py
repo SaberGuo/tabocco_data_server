@@ -79,22 +79,22 @@ class TCPClient(object):
 			'device_config_id': 98,
 			'method': 'push_data',
 			'package': {
-				# 1484447927: {
-				# 	'test1': {
-				# 		'value': 1
-				# 	},
-				# 	'test2': {
-				# 		'value': 2
-				# 	}
-				# },
-				# '1479798417': {
-				# 	'test3': {
-				# 		'value': 3
-				# 	},
-				# 	'test4': {
-				# 		'value': 4
-				# 	}
-				# }
+				1484447927: {
+					'test1': {
+						'value': 1
+					},
+					'test2': {
+						'value': 2
+					}
+				},
+				'1479798417': {
+					'test3': {
+						'value': 3
+					},
+					'test4': {
+						'value': 4
+					}
+				}
 			}
 		}
 		data = json.dumps(message)
@@ -105,8 +105,8 @@ class TCPClient(object):
 		self.shutdown = True
 def main():
 	io_loop = tornado.ioloop.IOLoop.instance()
-	client = TCPClient("123.57.60.239", 8000, io_loop)
-	# client = TCPClient("localhost", 8000, io_loop)
+	# client = TCPClient("123.57.60.239", 8000, io_loop)
+	client = TCPClient("localhost", 8000, io_loop)
 	client.connect()
 	client.set_shutdown()
 	io_loop.start()

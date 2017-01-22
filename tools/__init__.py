@@ -7,3 +7,4 @@ from tools.filepath_tools import *
 from tools.image_tools import *
 from tools.log_tools import *
 from tools.server_tools import *
+from tools.email_tools import *

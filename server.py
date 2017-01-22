@@ -7,7 +7,7 @@ import logging
 import argparse
 from tools import *
 from commons.macro import *
-from redis_cache import producer
+from redis_cache import producer, email_producer
 from tornado import gen, ioloop, stack_context
 from tornado.escape import native_str
 from tornado.tcpserver import TCPServer
@@ -60,6 +60,7 @@ class TornadoTCPConnection(object):
 		self.close()
 		logging.info('{} connection timeout.'.format(self.address_string))
 
+	@email_producer.email_wrapper
 	def on_message_receive(self, data):
 		try:
 			data_str = native_str(data.decode('UTF-8'))
@@ -70,6 +71,7 @@ class TornadoTCPConnection(object):
 				# if not self.json_request.__contains__(k):
 				self.json_request[k] = v
 			if self.json_request.__contains__('method'):
+				email_producer.insert_into_redis(data_str, EMAIL_REDIS_LIST_KEY)
 				request = self.json_request['method']
 				if request == 'push_data':
 					self.on_push_data_request(self.json_request)
@@ -93,13 +95,16 @@ class TornadoTCPConnection(object):
 			logging.info(e)
 			# print(e)
 			self.on_error_request()
+			raise e
 
+	# directly call
 	def on_push_data_request(self, request):
 		for ts, data in request['package'].items():
 			producer.insert_into_redis(get_data_to_save(request, ts, data), REDIS_LIST_KEY)
 		# self.stream.write(str.encode(get_reply_json(self.json_request)), callback = stack_context.wrap(self.wait_new_reqeust))
 		self.stream.write(str.encode(get_reply_json(self.json_request)), callback = stack_context.wrap(self.close))
-			
+
+	# directly call
 	@run_on_executor
 	def on_pull_param_request(self, request):
 		param = get_latest_device_config_json(request['device_id'])
@@ -108,9 +113,11 @@ class TornadoTCPConnection(object):
 		else:
 			self.on_error_request()
 
+	# call back
 	def wait_push_param_reply(self):
 		self.stream.read_bytes(num_bytes = TornadoTCPConnection.MAX_SIZE, callback=stack_context.wrap(self.on_message_receive), partial=True)
 
+	# directly call
 	def on_push_image_request(self, request):
 		num_bytes = self.json_request['size']
 		if isinstance(num_bytes, int) and num_bytes > 0: 
@@ -118,13 +125,16 @@ class TornadoTCPConnection(object):
 		else:
 			self.on_error_request()
 
+	# call back
 	def start_receive_image_data(self):
 		self.json_request['method'] = 'pushing_image'
 		# print('start_receive_image_data')
 		logging.info('start_receive_image_data')
 		self.stream.read_bytes(num_bytes = self.json_request['size'], callback=stack_context.wrap(self.on_image_upload_complete), partial=False)
 
+	# call back
 	@run_on_executor
+	@email_producer.email_wrapper
 	def on_image_upload_complete(self, data):
 		try:
 			filepath = check_device_img_file(self.json_request['device_id'])
@@ -141,6 +151,7 @@ class TornadoTCPConnection(object):
 			logging.info(e)
 			# print(e)
 			self.on_error_request()
+			raise e
 
 	def on_error_request(self):
 		# self.stream.write(str.encode(get_reply_json(is_failed = True)), callback = stack_context.wrap(self.wait_new_reqeust))
