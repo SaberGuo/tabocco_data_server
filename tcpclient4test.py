@@ -60,19 +60,19 @@ class TCPClient(object):
 	def send_message(self):
 		logging.info("Send message....")
 		global file_size
-		# message = {
-		# 	"device_id": 100,
-		# 	"device_config_id": 100,
-		# 	"method": "push_image",
-		# 	"key": 'etateetawetwe',
-		# 	"size": file_size,
-		# 	'acquisition_time': 1479798800
-		# }
-
 		message = {
-			'device_id': 50,
-			"method": 'pull_param'
+			"device_id": 1234,
+			"device_config_id": 100,
+			"method": "push_image",
+			"key": 'etateetawetwe',
+			"size": file_size,
+			'acquisition_time': 1479798812
 		}
+
+		# message = {
+		# 	'device_id': 2,
+		# 	"method": 'pull_param'
+		# }
 
 		# message = {
 		# 	'device_id': 99,
@@ -105,8 +105,8 @@ class TCPClient(object):
 		self.shutdown = True
 def main():
 	io_loop = tornado.ioloop.IOLoop.instance()
-	client = TCPClient("123.57.60.239", 8000, io_loop)
-	# client = TCPClient("localhost", 8000, io_loop)
+	# client = TCPClient("123.57.60.239", 7800, io_loop)
+	client = TCPClient("localhost", 7800, io_loop)
 	client.connect()
 	client.set_shutdown()
 	io_loop.start()
