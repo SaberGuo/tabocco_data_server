@@ -8,7 +8,7 @@ import logging
 import argparse
 sys.path.append('../')
 from commons.macro import *
-from tools.email_tools import send_alert_email
+from tools.db_tools import *
 
 class RedisConsumer(object):
 	"""docstring for RedisConsumer"""
