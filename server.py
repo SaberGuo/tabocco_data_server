@@ -140,7 +140,7 @@ class TornadoTCPConnection(object):
 			filepath = check_device_img_file(self.json_request['device_id'])
 			url = get_image_url_local(filepath, self.json_request['acquisition_time'])
 			save_image_local(data, url)
-			self.json_request['image_info'] = {self.json_request['key']:{'url':url}}
+			self.json_request['image_info'] = {self.json_request['key']:{'value':url}}
 			tmp_data = get_image_info_to_save(self.json_request)
 			if producer.insert_into_redis(tmp_data, REDIS_LIST_KEY):
 				# self.stream.write(str.encode(get_reply_json(self.json_request)), callback=stack_context.wrap(self.close))
