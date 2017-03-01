@@ -19,7 +19,7 @@ def save_to_upyun(data):
         res = None
         image_data = data['data']
         url_key = (image_data.keys())[0]
-        image_localpath = (image_data.values())[0]['url']
+        image_localpath = (image_data.values())[0]['value']
         image_localpath_components = image_localpath.split('/')
         upyun_save_path = "/%s/%s"%(image_localpath_components[-2],
             image_localpath_components[-1])
@@ -57,5 +57,5 @@ def save_to_upyun(data):
             if os.path.exists(image_localpath):
                 os.system(command)
             # replace local path with remote path
-            data['data'][url_key]['url'] = upyun_save_path
+            data['data'][url_key]['value'] = upyun_save_path
             return True
