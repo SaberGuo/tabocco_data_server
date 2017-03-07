@@ -23,7 +23,7 @@ def get_datetime_str_from_ts(ts):
 		elif isinstance(ts, str):
 			ts = int(ts.split('.')[0])
 			# ts = int(ts)
-		dt = datetime.datetime.fromtimestamp(ts)
+		dt = datetime.datetime.utcfromtimestamp(ts) + datetime.timedelta(hours=8)
 		dt_str = dt.strftime('%Y-%m-%d %H:%M:%S')
 		return dt_str
 	except Exception as e:
