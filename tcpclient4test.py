@@ -19,6 +19,7 @@ class TCPClient(object):
 	def __init__(self, host, port, io_loop=None):
 		self.host = host
 		self.port = port
+                self.cache_size = 10 * 1024 # 10kb
 		self.io_loop = io_loop
 		self.shutdown = False
 		self.stream = None
@@ -52,7 +53,7 @@ class TCPClient(object):
 			with open(file_path, 'rb') as reader:
 				tmp_img_data = reader.read(file_size)
 			self.stream.write(tmp_img_data)
-			self.stream.read_bytes(num_bytes = 512, callback = self.on_receive, partial=True)
+			self.stream.read_bytes(num_bytes = self.cache_size, callback = self.on_receive, partial=True)
 		else:
 			self.stream.close()
 	def on_close(self):
@@ -71,13 +72,13 @@ class TCPClient(object):
 			'acquisition_time': 1479798812
 		}
                 '''
-                '''
+                
 		message = {
 			'device_id': 1,
 			"method": 'pull_param'
 		}
-                '''
                 
+                '''
 		message = {
 			'device_id': 99,
 			'device_config_id': 98,
@@ -101,10 +102,10 @@ class TCPClient(object):
 				}
 			}
 		}
-                
+                '''
 		data = json.dumps(message)
 		self.stream.write(str.encode(data))
-		self.stream.read_bytes(num_bytes = 10 * 1024, callback = self.on_receive, partial=True)
+		self.stream.read_bytes(num_bytes = self.cache_size, callback = self.on_receive, partial=True)
 		logging.info("After send....")
 	def set_shutdown(self):
 		self.shutdown = True
