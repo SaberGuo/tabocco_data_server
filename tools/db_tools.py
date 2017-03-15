@@ -9,6 +9,7 @@ import mysql.connector
 sys.path.append('../')
 from commons.macro import *
 from tools.common_tools import get_current_ts
+from tools.upyun_tools import save_to_upyun
 
 def create_engine(user, password, database, host = '127.0.0.1', port = 3306, **kw):
     params = dict(user = user, password = password, database = database, host = host, port = port)
@@ -72,11 +73,15 @@ def save_json_data(json_data):
             if dict_data['type'] == 'image':
                 db_name = 'device_data'
                 # db_name = 'device_image'
+                if save_to_upyun(dict_data):
+                    sql = "insert into `%s` (`device_id`, `device_config_id`, `ts`, `data`) values \
+                                (%d, %d, '%s', '%s')"%(db_name, dict_data['device_id'], dict_data['device_config_id'], dict_data['ts'], json.dumps(dict_data['data']))
+                    cursor.execute(sql)
             else:
                 db_name = 'device_data'
-            sql = "insert into `%s` (`device_id`, `device_config_id`, `ts`, `data`) values \
-                        (%d, %d, '%s', '%s')"%(db_name, dict_data['device_id'], dict_data['device_config_id'], dict_data['ts'], json.dumps(dict_data['data']))
-            cursor.execute(sql)
+                sql = "insert into `%s` (`device_id`, `device_config_id`, `ts`, `data`) values \
+                            (%d, %d, '%s', '%s')"%(db_name, dict_data['device_id'], dict_data['device_config_id'], dict_data['ts'], json.dumps(dict_data['data']))
+                cursor.execute(sql)
             print('after execution')
             logging.info('after execution')
     except Exception as e:

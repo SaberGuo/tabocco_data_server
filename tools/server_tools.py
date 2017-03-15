@@ -13,6 +13,7 @@ from redis_cache import email_producer
 
 def get_reply_json(request = None, is_failed = False):
 	try:
+		print('line 1')
 		reply = {}
 		if is_failed:
 			reply = {'method':'failed','ts':get_current_ts()}
@@ -25,6 +26,9 @@ def get_reply_json(request = None, is_failed = False):
 				reply['method'] = 'push_image_ready'
 			if method == 'pushing_image':
 				reply['method'] = 'image_uploaded'
+                        if method == 'push_data_size':
+				print('here in get_reply_json')
+				reply['method'] = 'push_data_ready'
 		reply_str = json.dumps(reply)
 		email_producer.insert_into_redis(reply_str, macro.EMAIL_REDIS_LIST_KEY)
 		return reply_str

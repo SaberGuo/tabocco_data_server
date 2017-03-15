@@ -1,4 +1,4 @@
-#!/usr/bin/env python   
+#!/usr/bin/env python
 # -*- coding:utf-8 -*-
 
 import sys
@@ -34,13 +34,13 @@ class RedisConsumer(object):
 
 if __name__ == '__main__':
 	parser = argparse.ArgumentParser(description='redis_consumer')
-	parser.add_argument('--db', type=int, 
+	parser.add_argument('--db', type=int,
 		help='redis db num', default=None)
-	parser.add_argument('--key', type=str, 
+	parser.add_argument('--key', type=str,
 		help='read list key', default=None)
-	parser.add_argument('--host', type=str, 
+	parser.add_argument('--host', type=str,
 		help='address list key', default='localhost')
-	parser.add_argument('--port', type=int, 
+	parser.add_argument('--port', type=int,
 		help='port to connect', default=6379)
 	args = parser.parse_args()
 	redis_consumer = RedisConsumer(args.db, args.key, args.host, args.port)

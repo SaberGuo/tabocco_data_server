@@ -53,8 +53,12 @@ class TornadoTCPConnection(object):
 		self.timeout_handle = self.io_loop.add_timeout(self.io_loop.time() + TCP_CONNECTION_TIMEOUT, stack_context.wrap(self.on_timeout))
 		self.stream.read_bytes(num_bytes = TornadoTCPConnection.MAX_SIZE, callback=stack_context.wrap(self.on_message_receive), partial=True)
 
-	def wait_new_reqeust(self):
+	def wait_new_request(self):
 		self.stream.read_bytes(num_bytes = TornadoTCPConnection.MAX_SIZE, callback=stack_context.wrap(self.on_message_receive), partial=True)
+	
+	# call back
+	def wait_push_data_request(self):
+		self.stream.read_bytes(num_bytes = self.json_request['size'], callback=stack_context.wrap(self.on_message_receive), partial=False)
 
 	def on_timeout(self):
 		self.close()
@@ -75,6 +79,9 @@ class TornadoTCPConnection(object):
 				request = self.json_request['method']
 				if request == 'push_data':
 					self.on_push_data_request(self.json_request)
+                                elif request == 'push_data_size':
+					print('here in push_data_size')
+					self.on_push_data_size_request()
 				elif request == 'pull_param':
 					self.on_pull_param_request(self.json_request)
 				elif request == 'push_image':
@@ -96,12 +103,16 @@ class TornadoTCPConnection(object):
 			# print(e)
 			self.on_error_request()
 			raise e
+        
+	# directly call
+        def on_push_data_size_request(self):
+		self.stream.write(str.encode(get_reply_json(self.json_request)), callback = stack_context.wrap(self.wait_push_data_request))
 
 	# directly call
 	def on_push_data_request(self, request):
 		for ts, data in request['package'].items():
 			producer.insert_into_redis(get_data_to_save(request, ts, data), REDIS_LIST_KEY)
-		# self.stream.write(str.encode(get_reply_json(self.json_request)), callback = stack_context.wrap(self.wait_new_reqeust))
+		# self.stream.write(str.encode(get_reply_json(self.json_request)), callback = stack_context.wrap(self.wait_new_request))
 		self.stream.write(str.encode(get_reply_json(self.json_request)), callback = stack_context.wrap(self.close))
 
 	# directly call
@@ -109,6 +120,7 @@ class TornadoTCPConnection(object):
 	def on_pull_param_request(self, request):
 		param = get_latest_device_config_json(request['device_id'])
 		if param:
+                        print(len(str.encode(param)))
 			self.stream.write(str.encode(param), callback=stack_context.wrap(self.wait_push_param_reply))
 		else:
 			self.on_error_request()
@@ -140,11 +152,11 @@ class TornadoTCPConnection(object):
 			filepath = check_device_img_file(self.json_request['device_id'])
 			url = get_image_url_local(filepath, self.json_request['acquisition_time'])
 			save_image_local(data, url)
-			self.json_request['image_info'] = {self.json_request['key']:{'url':url}}
+			self.json_request['image_info'] = {self.json_request['key']:{'value':url}}
 			tmp_data = get_image_info_to_save(self.json_request)
 			if producer.insert_into_redis(tmp_data, REDIS_LIST_KEY):
 				# self.stream.write(str.encode(get_reply_json(self.json_request)), callback=stack_context.wrap(self.close))
-				self.stream.write(str.encode(get_reply_json(self.json_request)), callback=stack_context.wrap(self.wait_new_reqeust))
+				self.stream.write(str.encode(get_reply_json(self.json_request)), callback=stack_context.wrap(self.wait_new_request))
 			else:
 				self.on_error_request()
 		except Exception as e:
@@ -154,7 +166,7 @@ class TornadoTCPConnection(object):
 			raise e
 
 	def on_error_request(self):
-		# self.stream.write(str.encode(get_reply_json(is_failed = True)), callback = stack_context.wrap(self.wait_new_reqeust))
+		# self.stream.write(str.encode(get_reply_json(is_failed = True)), callback = stack_context.wrap(self.wait_new_request))
 		self.stream.write(str.encode(get_reply_json(is_failed = True)), callback = stack_context.wrap(self.close))
 
 	def clear_request_state(self):
