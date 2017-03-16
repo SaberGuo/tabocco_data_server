@@ -11,15 +11,15 @@ import socket
 import json
 import os
 
-#file_path = '/home/sonic513/10630a450941b72c1c1357b302f56c18.jpg'
-file_path = '/Users/guoxiao/Documents/test.jpg'
+file_path = '/home/sonic513/10630a450941b72c1c1357b302f56c18.jpg'
+# file_path = '/Users/guoxiao/Documents/test.jpg'
 file_size = os.path.getsize(file_path)
 
 class TCPClient(object):
 	def __init__(self, host, port, io_loop=None):
 		self.host = host
 		self.port = port
-                self.cache_size = 10 * 1024 # 10kb
+		self.cache_size = 10 * 1024 # 10kb
 		self.io_loop = io_loop
 		self.shutdown = False
 		self.stream = None
@@ -62,23 +62,23 @@ class TCPClient(object):
 	def send_message(self):
 		logging.info("Send message....")
 		global file_size
-                '''
+		'''
 		message = {
 			"device_id": 1234,
 			"device_config_id": 100,
 			"method": "push_image",
 			"key": 'etateetawetwe',
 			"size": file_size,
-			'acquisition_time': 1479798812
+			'acquisition_time': 1479798817
 		}
-                '''
-                
+		'''
+		'''
 		message = {
 			'device_id': 1,
 			"method": 'pull_param'
 		}
-                
-                '''
+		'''
+		
 		message = {
 			'device_id': 99,
 			'device_config_id': 98,
@@ -102,7 +102,7 @@ class TCPClient(object):
 				}
 			}
 		}
-                '''
+		
 		data = json.dumps(message)
 		self.stream.write(str.encode(data))
 		self.stream.read_bytes(num_bytes = self.cache_size, callback = self.on_receive, partial=True)
@@ -122,4 +122,4 @@ if __name__ == "__main__":
 	except Exception as e:
 		logging.info("Ocurred Exception: %s" % str(e))
 		# print("Ocurred Exception: %s" % str(e))
-        quit()
+		quit()
