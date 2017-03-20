@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
 
-
+import os
 import sys
 from datetime import *
 sys.path.append('../')
@@ -22,10 +22,26 @@ def status_check(threshold):
                     device.status = 'abnormal'
                     station.status = 'abnormal'
                     continue
-                tmp = datetime.utcnow() + timedelta(hours=8) - device_lastest_data.created_at # Beijing timezone 8 hours later than utc zone !
-                if tmp > timedelta(threshold):
+                print(device_lastest_data.created_at)
+                tmp = datetime.utcnow() + timedelta(hours = 8) - device_lastest_data.created_at # Beijing timezone 8 hours later than utc zone !
+                print(tmp)
+                if tmp > timedelta(hours = threshold):
                     device.status = 'abnormal'
                     station.status = 'abnormal'
+
+
+# should only be called by server.py
+def initialize_service_bash():
+    python_execution_path = sys.executable
+    service_file_path = os.path.join(sys.path[0], 'services/status_check_service.py')
+    service_bash_path = os.path.join(sys.path[0], 'services/status_check.sh')
+    bash_header = '#! /bin/bash'
+    bash_body = python_execution_path + ' ' + service_file_path
+    with open(service_bash_path, 'wb+') as f:
+    	f.write(bash_header + '\n')
+    	f.write('\n')
+    	f.write(bash_body)
+    return
 
 
 if __name__ == '__main__':

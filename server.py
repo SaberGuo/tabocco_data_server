@@ -7,6 +7,7 @@ import logging
 import argparse
 from tools import *
 from commons.macro import *
+from services import *
 from redis_cache import producer, email_producer
 from tornado import gen, ioloop, stack_context
 from tornado.escape import native_str
@@ -203,6 +204,7 @@ def main():
 
 if __name__ == "__main__":
 	try:
+		initialize_service_bash()
 		main()
 	except Exception as e:
 		logging.info("ocurred Exception: %s" % str(e))

@@ -72,13 +72,13 @@ class TCPClient(object):
 			'acquisition_time': 1479798817
 		}
 		'''
-		'''
+		
 		message = {
 			'device_id': 1,
 			"method": 'pull_param'
 		}
-		'''
 		
+		'''
 		message = {
 			'device_id': 99,
 			'device_config_id': 98,
@@ -102,7 +102,7 @@ class TCPClient(object):
 				}
 			}
 		}
-		
+		'''
 		data = json.dumps(message)
 		self.stream.write(str.encode(data))
 		self.stream.read_bytes(num_bytes = self.cache_size, callback = self.on_receive, partial=True)
