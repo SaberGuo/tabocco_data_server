@@ -34,6 +34,7 @@ class Device(Base):
 	model = Column(VARCHAR(length = 50))
 	sn = Column(VARCHAR(length = 50))
 	version = Column(VARCHAR(length = 50))
+        status = Column(ENUM('normal', 'abnormal'))
 	updated_at = Column(TIMESTAMP, nullable = False)
 	created_at = Column(TIMESTAMP, nullable = False)
 	deleted_at = Column(TIMESTAMP, nullable = True)
@@ -42,3 +43,5 @@ class Device(Base):
 	station = relationship('Station', back_populates = 'devices')
 
 	device_configs = relationship('Device_config', back_populates = 'device')
+
+        device_datas = relationship('Device_data', back_populates = 'device')

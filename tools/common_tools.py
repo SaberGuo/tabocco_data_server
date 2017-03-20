@@ -30,6 +30,8 @@ def get_datetime_str_from_ts(ts):
 		logging.info(e)
 		# print(e)
 		return ''
+def get_current_dt():
+	return datetime.datetime.utcnow() + datetime.timedelta(hours=8)
 
 def string2json(string):
 	pass

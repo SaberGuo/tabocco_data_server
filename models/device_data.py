@@ -25,7 +25,7 @@ class Device_data(Base):
 	__tablename__ = 'device_data'
 
 	id = Column(INTEGER(display_width = 10), primary_key = True)
-	device_id = Column(INTEGER(display_width = 10))
+	# device_id = Column(INTEGER(display_width = 10))
 	data = Column(JSON)
 	ts = Column(TIMESTAMP, nullable = True)
 	updated_at = Column(TIMESTAMP, nullable = False)
@@ -34,3 +34,6 @@ class Device_data(Base):
 
 	device_config_id = Column(INTEGER(display_width = 10), ForeignKey('device_config.id'))
 	device_config = relationship('Device_config', back_populates = 'device_datas')
+        
+	device_id = Column(INTEGER(display_width = 10), ForeignKey('device.id'))
+	device = relationship('Device', back_populates = 'device_datas')
