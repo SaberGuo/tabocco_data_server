@@ -14,20 +14,24 @@ def status_check(threshold):
         # print(len(stations))
         for station in stations:
             station.status = 'normal'
+            if station.deleted_at:
+                station.status = 'abnormal'
+                continue
             devices = station.devices
             if not devices:
                 station.status = 'abnormal'
                 continue
             for device in devices:
+                if device.deleted_at:
+                    device.status = 'abnormal'
+                    continue
                 device.status = 'normal'
                 device_lastest_data = session.query(Device_data).filter_by(device_id = device.id).order_by(Device_data.created_at.desc()).first()
                 if device_lastest_data is None:
                     device.status = 'abnormal'
                     station.status = 'abnormal'
                     continue
-                print(device_lastest_data.created_at)
                 tmp = datetime.utcnow() + timedelta(hours = 8) - device_lastest_data.created_at # Beijing timezone 8 hours later than utc zone !
-                print(tmp)
                 if tmp > timedelta(hours = threshold):
                     device.status = 'abnormal'
                     station.status = 'abnormal'
