@@ -38,30 +38,30 @@ class database_resource:
         self.cursor.close()
         self.conn.close()
 
-# def get_latest_device_config_json(device_id):
-#     try:
-#         if not isinstance(device_id, int):
-#             device_id = int(device_id)
-#         param = {}
-#         with database_resource() as cursor:
-#             sql = 'select `%s`, `%s`, `%s` from `%s` where `%s` = %d order by id desc'%('id', 'data', 'control', 'device_config', 'device_id', device_id)
-#             cursor.execute(sql)
-#             value = cursor.fetchone()
-#             device_config_id = value[0]
-#             data = json.loads(value[1])
-#             control = json.loads(value[2])
-#             param['device_id'] = device_id
-#             param['device_config_id'] = device_config_id
-#             param['method'] = 'push_param'
-#             param['config'] = data
-#             param['control'] = control
-#             param['ts'] = get_current_ts()
-#         return json.dumps(param)
-#     except Exception as e:
-#         logging.info(e)
-#         # print(e)
-#         return None
-
+def get_latest_device_config_json(device_id):
+    try:
+        if not isinstance(device_id, int):
+            device_id = int(device_id)
+        param = {}
+        with database_resource() as cursor:
+            sql = 'select `%s`, `%s`, `%s` from `%s` where `%s` = %d order by id desc'%('id', 'data', 'control', 'device_config', 'device_id', device_id)
+            cursor.execute(sql)
+            value = cursor.fetchone()
+            device_config_id = value[0]
+            data = json.loads(value[1])
+            control = json.loads(value[2])
+            param['device_id'] = device_id
+            param['device_config_id'] = device_config_id
+            param['method'] = 'push_param'
+            param['config'] = data
+            param['control'] = control
+            param['ts'] = get_current_ts()
+        return json.dumps(param)
+    except Exception as e:
+        logging.info(e)
+        # print(e)
+        return None
+'''
 def get_latest_device_config_json(device_id):
     try:
         if not isinstance(device_id, int):
@@ -81,7 +81,7 @@ def get_latest_device_config_json(device_id):
         logging.info(e)
         # print(e)
         return None
-
+'''
 # def save_json_data(json_data):
 #     try:
 #         dict_data = json.loads(json_data)

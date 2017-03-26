@@ -15,6 +15,9 @@ def status_check(threshold):
         for station in stations:
             station.status = 'normal'
             devices = station.devices
+            if not devices:
+                station.status = 'abnormal'
+                continue
             for device in devices:
                 device.status = 'normal'
                 device_lastest_data = session.query(Device_data).filter_by(device_id = device.id).order_by(Device_data.created_at.desc()).first()
