@@ -52,5 +52,5 @@ def initialize_service_bash():
 
 
 if __name__ == '__main__':
-       status_check(1)
+       status_check(6)
        print('check finish !')
