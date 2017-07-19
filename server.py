@@ -109,6 +109,7 @@ class TornadoTCPConnection(object):
 				self.on_error_request()
 		except Exception as e:
 			logging.info(e)
+			print(e)
 			self.on_error_request()
 			raise e
 
@@ -130,25 +131,29 @@ class TornadoTCPConnection(object):
 	def receiving_data(self, data):
 		data_str = native_str(data.decode('UTF-8'))
 		data_dict = convert_request_to_dict(data_str)
-		if data_dict.__contains__('method'):
-			self.json_request['method'] = data_dict['method']
-			self.stop_receiving_data()
+		if data_dict == None:
+			self.on_error_request()
 		else:
-			self.count += 1
-			user_define_key = ''
-			for k, v in data_dict.items():
-				if k is not 'ts':
-					user_define_key = k
-			if self.data_cache['package'].__contains__(data_dict['ts']):
-				self.data_cache['package'][data_dict['ts']][user_define_key] = {'value':data_dict[user_define_key]}
+			if data_dict.__contains__('method'):
+				self.json_request['method'] = data_dict['method']
+				self.stop_receiving_data()
 			else:
-				self.data_cache['package'][data_dict['ts']] = {}
-				self.data_cache['package'][data_dict['ts']][user_define_key] = {'value':data_dict[user_define_key]}
-			self.stream.read_bytes(num_bytes = TornadoTCPConnection.MAX_SIZE, callback=stack_context.wrap(self.receiving_data), partial=True)
+				self.count += 1
+				user_define_key = ''
+				for k, v in data_dict.items():
+					if k != 'ts':
+						user_define_key = k
+				if self.data_cache['package'].__contains__(data_dict['ts']):
+					self.data_cache['package'][data_dict['ts']][user_define_key] = {'value':data_dict[user_define_key]}
+				else:
+					self.data_cache['package'][data_dict['ts']] = {}
+					self.data_cache['package'][data_dict['ts']][user_define_key] = {'value':data_dict[user_define_key]}
+				self.stream.read_bytes(num_bytes = TornadoTCPConnection.MAX_SIZE, callback=stack_context.wrap(self.receiving_data), partial=True)
 
 	# directly call
 	def stop_receiving_data(self):
 		if self.count == int(self.json_request['count']):
+			print(self.data_cache)
 			for ts, data in self.data_cache['package'].items():
 				producer.insert_into_redis(get_data_to_save(self.json_request, ts, data), REDIS_LIST_KEY)
 			self.stream.write(str.encode(get_reply_string(self.json_request)), callback = stack_context.wrap(self.close))
@@ -183,7 +188,7 @@ class TornadoTCPConnection(object):
 			self.json_request['image_info'] = {self.json_request['key']:{'value':url}}
 			tmp_data = get_image_info_to_save(self.json_request)
 			if producer.insert_into_redis(tmp_data, REDIS_LIST_KEY):
-				self.stream.write(str.encode(get_reply_json(self.json_request)), callback=stack_context.wrap(self.wait_new_request))
+				self.stream.write(str.encode(get_reply_string(self.json_request)), callback=stack_context.wrap(self.wait_new_request))
 			else:
 				self.on_error_request()
 		except Exception as e:
@@ -192,17 +197,20 @@ class TornadoTCPConnection(object):
 			raise e
 
 	# directly call
-	@run_on_executor
+	# @run_on_executor
 	def handle_pull_param(self, request):
 		print(request['method'])
 		param = get_latest_device_config_string(request['device_id'])
-		if param:
-			self.stream.write(str.encode(param), callback=stack_context.wrap(self.wait_push_param_reply))
+		if param != None:
+			print('before send param')
+			self.stream.write(param.encode('utf-8'), callback=stack_context.wrap(self.wait_push_param_reply))
+			# self.stream.write(str.encode(param), callback=stack_context.wrap(self.wait_push_param_reply))
 		else:
 			self.on_error_request()
 
 	# call back
 	def wait_push_param_reply(self):
+		print('wait_push_param_reply')
 		self.stream.read_bytes(num_bytes = TornadoTCPConnection.MAX_SIZE, callback=stack_context.wrap(self.on_message_receive), partial=True)
 
 	# directly call
@@ -275,7 +283,7 @@ class TornadoTCPConnection(object):
 	# 		raise e
 
 	def on_error_request(self):
-		self.stream.write(str.encode(get_reply_json(is_failed = True)), callback = stack_context.wrap(self.close))
+		self.stream.write(str.encode(get_reply_string(is_failed = True)), callback = stack_context.wrap(self.close))
 
 	def clear_request_state(self):
 		self._close_callback = None

@@ -89,7 +89,7 @@ def get_latest_device_config_string(device_id):
                 param = param + '[' + str(k) + ']'
                 for key,value  in v.items():
                     param  = param + str(key) + '=' + str(value) + ';'
-        print(param)
+        # print(param)
         return param + b'\x03'
     except Exception as e:
         logging.info(e)
