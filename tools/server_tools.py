@@ -26,7 +26,7 @@ def get_reply_json(request = None, is_failed = False):
 				reply['method'] = 'push_image_ready'
 			if method == 'pushing_image':
 				reply['method'] = 'image_uploaded'
-                        if method == 'push_data_size':
+			if method == 'push_data_size':
 				print('here in get_reply_json')
 				reply['method'] = 'push_data_ready'
 		reply_str = json.dumps(reply)
@@ -37,6 +37,27 @@ def get_reply_json(request = None, is_failed = False):
 		print(e)
 		return json.dumps({'method':'failed','ts':get_current_ts()})
 
+def get_reply_string(request = None, is_failed = False):
+	try:
+		reply = ''
+		if is_failed:
+			reply = 'method:failed,ts:'+str(get_current_ts())
+		else:
+			method = request['method']
+			if method == 'push_data':
+				reply = 'method:push_data_ready,ts:'+str(get_current_ts())
+			if method == 'push_data_finish':
+				reply = 'method:data_uploaded,ts:'+str(get_current_ts())
+			if method == 'push_image':
+				reply = 'method:push_image_ready,ts:'+str(get_current_ts())
+			if method == 'pushing_image':
+				reply = 'method:image_uploaded,ts:'+str(get_current_ts())
+		return reply + b'\x03'
+	except Exception as e:
+		logging.info(e)
+		print(e)
+		return 'method:failed,ts:'+str(get_current_ts())+b'\x03'
+
 def get_data_to_save(request, ts, data):
 	try:
 		tmp_data = {}
@@ -45,12 +66,10 @@ def get_data_to_save(request, ts, data):
 		tmp_data['device_config_id'] = request['device_config_id']
 		tmp_data['data'] = data
 		tmp_data['ts'] = get_datetime_str_from_ts(ts)
-		# print(tmp_data)
 		return tmp_data
 	except Exception as e:
 		logging.info(e)
 		email_producer.insert_into_redis(e, macro.EMAIL_REDIS_LIST_KEY)
-		# print(e)
 		return None
 
 def get_image_info_to_save(request):
@@ -68,7 +87,22 @@ def get_image_info_to_save(request):
 	except Exception as e:
 		logging.info(e)
 		email_producer.insert_into_redis(e, macro.EMAIL_REDIS_LIST_KEY)
-		# print(e)
+		return None
+
+def convert_request_to_dict(request):
+	try:
+		request = request.replace('\r', '')
+		request = request.replace('\n', '')
+		request_list = request.split(',')
+		request_dict = {}
+		for i in xrange(0,len(request_list)):
+			tmp_list = (request_list[i]).split(':')
+			key = tmp_list[0]
+			value = tmp_list[1]
+			request_dict[key] = value
+		return request_dict
+	except Exception as e:
+		logging.info(e)
 		return None
 
 if __name__ == '__main__':
