@@ -1,4 +1,4 @@
-#!/usr/bin/env python   
+#!/usr/bin/env python
 # -*- coding:utf-8 -*-
 
 import sys
@@ -20,13 +20,15 @@ def get_reply_json(request = None, is_failed = False):
 		else:
 			method = request['method']
 			reply = {'device_id':request['device_id'], 'method':'', 'ts':get_current_ts()}
+			if method == 'update_device_info':
+				reply['method'] = 'updated_device_info'
 			if method == 'push_data':
 				reply['method'] = 'data_uploaded'
 			if method == 'push_image':
 				reply['method'] = 'push_image_ready'
 			if method == 'pushing_image':
 				reply['method'] = 'image_uploaded'
-                        if method == 'push_data_size':
+			if method == 'push_data_size':
 				print('here in get_reply_json')
 				reply['method'] = 'push_data_ready'
 		reply_str = json.dumps(reply)

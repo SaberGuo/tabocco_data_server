@@ -1,4 +1,4 @@
-#!/usr/bin/env python   
+#!/usr/bin/env python
 # -*- coding:utf-8 -*-
 
 import json
@@ -56,7 +56,7 @@ class TornadoTCPConnection(object):
 
 	def wait_new_request(self):
 		self.stream.read_bytes(num_bytes = TornadoTCPConnection.MAX_SIZE, callback=stack_context.wrap(self.on_message_receive), partial=True)
-	
+
 	# call back
 	def wait_push_data_request(self):
 		self.stream.read_bytes(num_bytes = self.json_request['size'], callback=stack_context.wrap(self.on_message_receive), partial=False)
@@ -97,6 +97,10 @@ class TornadoTCPConnection(object):
 					logging.info('close_connection')
 					# print('close_connection')
 					self.close()
+				elif request == 'update_device_info':
+					loggin.info('update device info')
+					self.on_update_device_info(self.json_request)
+					#self.close()
 			else:
 				self.on_error_request()
 		except Exception as e:
@@ -104,9 +108,13 @@ class TornadoTCPConnection(object):
 			# print(e)
 			self.on_error_request()
 			raise e
-        
+
+	def on_update_device_info(self, request):
+		print(request['method'])
+		is_fail = ~update_device_info(request['device_id'], request['info']['lat'], request['info']['lon'], request['info']['alt'])
+		self.stream.write(str.encode(get_reply_json(request, is_fail)),callback = stack_context.wrap(self.close))
 	# directly call
-        def on_push_data_size_request(self):
+    def on_push_data_size_request(self):
 		self.stream.write(str.encode(get_reply_json(self.json_request)), callback = stack_context.wrap(self.wait_push_data_request))
 
 	# directly call
@@ -133,7 +141,7 @@ class TornadoTCPConnection(object):
 	# directly call
 	def on_push_image_request(self, request):
 		num_bytes = self.json_request['size']
-		if isinstance(num_bytes, int) and num_bytes > 0: 
+		if isinstance(num_bytes, int) and num_bytes > 0:
 			self.stream.write(str.encode(get_reply_json(self.json_request)), callback = stack_context.wrap(self.start_receive_image_data))
 		else:
 			self.on_error_request()
@@ -192,7 +200,7 @@ class TornadoTCPConnection(object):
 
 def main():
 	parser = argparse.ArgumentParser(description='custom_tcp_server')
-	parser.add_argument('-p', '--port', type=int, 
+	parser.add_argument('-p', '--port', type=int,
 		help='port to listen')
 	args = parser.parse_args()
 	logging.basicConfig(level=logging.INFO)

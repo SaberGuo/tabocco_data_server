@@ -37,6 +37,25 @@ class database_resource:
         self.conn.commit()
         self.cursor.close()
         self.conn.close()
+        
+def update_device_info(device_id, lat, lon, alt):
+    try:
+        if not isinstance(device_id, int):
+            device_id = int(device_id)
+        if not isinstance(lat, float):
+            lat = float(lat)
+        if not isinstance(lon, float):
+            lon = float(lon)
+        if not isinstance(lat, float):
+            lat = float(lat)
+        with database_resource() as cursor:
+            sql = 'update `%s` set `%s` = %f `%s` = %f `%s` = %f where `%s` = %d'%('device', 'lat', lat, 'lon', lon, 'alt', alt, 'id', device_id)
+            cursor.execute(sql)
+            return True
+
+    except Exception as e:
+        logging.info(e)
+        return False
 
 def get_latest_device_config_json(device_id):
     try:
