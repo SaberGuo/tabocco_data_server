@@ -14,17 +14,20 @@ BUCKET = macro.UPYUN_BUCKET
 USERNAME = macro.UPYUN_USERNAME
 PASSWORD = macro.UPYUN_PASSWORD
 
+
 def save_to_upyun(data):
     try:
+        if BUCKET == 'local':
+            return True
         res = None
         image_data = data['data']
         url_key = (image_data.keys())[0]
         image_localpath = (image_data.values())[0]['value']
         image_localpath_components = image_localpath.split('/')
-        upyun_save_path = "/%s/%s"%(image_localpath_components[-2],
-            image_localpath_components[-1])
-        up = upyun.UpYun(BUCKET, username = USERNAME, password = PASSWORD,
-            timeout = 30, endpoint = upyun.ED_AUTO)
+        upyun_save_path = "/%s/%s" % (image_localpath_components[-2],
+                                      image_localpath_components[-1])
+        up = upyun.UpYun(BUCKET, username=USERNAME, password=PASSWORD,
+                         timeout=30, endpoint=upyun.ED_AUTO)
         if os.path.exists(image_localpath):
             with open(image_localpath, 'rb') as f:
                 res = up.put(upyun_save_path, f)
@@ -53,7 +56,7 @@ def save_to_upyun(data):
             return False
         else:
             # delete local image file
-            command = "rm -f %s"%(image_localpath)
+            command = "rm -f %s" % (image_localpath)
             if os.path.exists(image_localpath):
                 os.system(command)
             # replace local path with remote path
