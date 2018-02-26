@@ -1,4 +1,4 @@
-#!/usr/bin/env python   
+#!/usr/bin/env python
 # -*- coding:utf-8 -*-
 
 import json
@@ -56,7 +56,7 @@ class TornadoTCPConnection(object):
 
 	def wait_new_request(self):
 		self.stream.read_bytes(num_bytes = TornadoTCPConnection.MAX_SIZE, callback=stack_context.wrap(self.on_message_receive), partial=True)
-	
+
 	# call back
 	def wait_push_data_request(self):
 		self.stream.read_bytes(num_bytes = self.json_request['size'], callback=stack_context.wrap(self.on_message_receive), partial=False)
@@ -80,7 +80,7 @@ class TornadoTCPConnection(object):
 				request = self.json_request['method']
 				if request == 'push_data':
 					self.on_push_data_request(self.json_request)
-                                elif request == 'push_data_size':
+                elif request == 'push_data_size':
 					print('here in push_data_size')
 					self.on_push_data_size_request()
 				elif request == 'pull_param':
@@ -89,6 +89,10 @@ class TornadoTCPConnection(object):
 					# print('push_image')
 					logging.info('push_image')
 					self.on_push_image_request(self.json_request)
+				elif request == 'update_device_info':
+					self.on_update_device_info_request()
+				elif request == 'update_time':
+					self.on_update_time_request(self.json_request)
 				elif request == 'param_updated':
 					logging.info('param_updated')
 					# print('param_updated')
@@ -104,7 +108,7 @@ class TornadoTCPConnection(object):
 			# print(e)
 			self.on_error_request()
 			raise e
-        
+
 	# directly call
         def on_push_data_size_request(self):
 		self.stream.write(str.encode(get_reply_json(self.json_request)), callback = stack_context.wrap(self.wait_push_data_request))
@@ -133,7 +137,7 @@ class TornadoTCPConnection(object):
 	# directly call
 	def on_push_image_request(self, request):
 		num_bytes = self.json_request['size']
-		if isinstance(num_bytes, int) and num_bytes > 0: 
+		if isinstance(num_bytes, int) and num_bytes > 0:
 			self.stream.write(str.encode(get_reply_json(self.json_request)), callback = stack_context.wrap(self.start_receive_image_data))
 		else:
 			self.on_error_request()
@@ -166,6 +170,14 @@ class TornadoTCPConnection(object):
 			self.on_error_request()
 			raise e
 
+	# directly call
+	def on_update_device_info_request(self, request):
+		self.stream.write(str.encode(get_reply_json(self.json_request)), callback = stack_context.wrap(self.close))
+
+	# directly call
+	def on_update_time_request(self, request):
+		self.stream.write(str.encode(get_reply_json(self.json_request)), callback = stack_context.wrap(self.close))
+
 	def on_error_request(self):
 		# self.stream.write(str.encode(get_reply_json(is_failed = True)), callback = stack_context.wrap(self.wait_new_request))
 		self.stream.write(str.encode(get_reply_json(is_failed = True)), callback = stack_context.wrap(self.close))
@@ -192,7 +204,7 @@ class TornadoTCPConnection(object):
 
 def main():
 	parser = argparse.ArgumentParser(description='custom_tcp_server')
-	parser.add_argument('-p', '--port', type=int, 
+	parser.add_argument('-p', '--port', type=int,
 		help='port to listen')
 	args = parser.parse_args()
 	logging.basicConfig(level=logging.INFO)

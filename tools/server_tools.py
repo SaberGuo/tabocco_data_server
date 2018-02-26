@@ -1,4 +1,4 @@
-#!/usr/bin/env python   
+#!/usr/bin/env python
 # -*- coding:utf-8 -*-
 
 import sys
@@ -29,6 +29,10 @@ def get_reply_json(request = None, is_failed = False):
                         if method == 'push_data_size':
 				print('here in get_reply_json')
 				reply['method'] = 'push_data_ready'
+			if method == 'update_device_info':
+				reply['method'] = 'update_device_info'
+			if method == 'update_time':
+				reply = {'ts':get_current_ts()}
 		reply_str = json.dumps(reply)
 		email_producer.insert_into_redis(reply_str, macro.EMAIL_REDIS_LIST_KEY)
 		return reply_str
