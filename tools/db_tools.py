@@ -44,15 +44,18 @@ def get_latest_device_config_json(device_id):
             device_id = int(device_id)
         param = {}
         with database_resource() as cursor:
-            sql = 'select `%s`, `%s` from `%s` where `%s` = %d order by id desc'%('id', 'data', 'device_config', 'device_id', device_id)
+            sql = 'select `%s`, `%s`, `%s` from `%s` where `%s` = %d order by id desc'%('id', 'data', 'control', 'device_config', 'device_id', device_id)
             cursor.execute(sql)
             value = cursor.fetchone()
             device_config_id = value[0]
             data = json.loads(value[1])
+            control = json.loads(value[2])
             param['device_id'] = device_id
             param['device_config_id'] = device_config_id
             param['method'] = 'push_param'
-            param['config'] = convert_config(data)
+            param['data'] = convert_data_config(data)
+            param['image'] = convert_image_config(data)
+            param['control'] = control
             param['ts'] = get_current_ts()
         return json.dumps(param)
     except Exception as e:
@@ -60,25 +63,52 @@ def get_latest_device_config_json(device_id):
         # print(e)
         return None
 
-def convert_config(data):
+def convert_data_config(data):
     tmp_dict = {}
     for k, v in data.items():
-        port = v['port']
-        port_num = v['port_num']
-        data_num = str(v['data_num'])
-        desc = v['desc']
-        name = v['name']
-        sensor_type = v['sensor_type']
-        tmp_dict_key = name+str(port_num)
-        if tmp_dict.has_key(tmp_dict_key):
-            tmp_dict[tmp_dict_key]['keys'][data_num] = k
-        else:
-            tmp_dict[tmp_dict_key] = {}
-            tmp_dict[tmp_dict_key]['port'] = port
-            tmp_dict[tmp_dict_key]['port_num'] = port_num
-            tmp_dict[tmp_dict_key]['sensor_type'] = sensor_type
-            tmp_dict[tmp_dict_key]['keys'] = {}
-            tmp_dict[tmp_dict_key]['keys'][data_num] = k
+        if v['port'] is not 'image':
+            port = v['port']
+            port_num = v['port_num']
+            data_num = str(v['data_num'])
+            desc = v['desc']
+            name = v['name']
+            sensor_type = v['sensor_type']
+            tmp_dict_key = name+str(port_num)
+            if tmp_dict.has_key(tmp_dict_key):
+                tmp_dict[tmp_dict_key]['keys'][data_num] = k
+            else:
+                tmp_dict[tmp_dict_key] = {}
+                tmp_dict[tmp_dict_key]['port'] = port
+                tmp_dict[tmp_dict_key]['port_num'] = port_num
+                tmp_dict[tmp_dict_key]['sensor_type'] = sensor_type
+                tmp_dict[tmp_dict_key]['keys'] = {}
+                tmp_dict[tmp_dict_key]['keys'][data_num] = k
+    tmp_list = []
+    for value in tmp_dict.values():
+        tmp_list.append(value)
+    print(tmp_list)
+    return tmp_list
+
+def convert_image_config(data):
+    tmp_dict = {}
+    for k, v in data.items():
+        if v['port'] == 'image':
+            port = v['port']
+            port_num = v['port_num']
+            data_num = str(v['data_num'])
+            desc = v['desc']
+            name = v['name']
+            sensor_type = v['sensor_type']
+            tmp_dict_key = name+str(port_num)
+            if tmp_dict.has_key(tmp_dict_key):
+                tmp_dict[tmp_dict_key]['keys'][data_num] = k
+            else:
+                tmp_dict[tmp_dict_key] = {}
+                tmp_dict[tmp_dict_key]['port'] = port
+                tmp_dict[tmp_dict_key]['port_num'] = port_num
+                tmp_dict[tmp_dict_key]['sensor_type'] = sensor_type
+                tmp_dict[tmp_dict_key]['keys'] = {}
+                tmp_dict[tmp_dict_key]['keys'][data_num] = k
     tmp_list = []
     for value in tmp_dict.values():
         tmp_list.append(value)
@@ -244,7 +274,7 @@ if __name__ == '__main__':
     })
 
     # save_json_data(json_data_to_save)
-    convert_config({
+    test_config = {
         'key1':
             {
                 'port': 'string',
@@ -280,5 +310,16 @@ if __name__ == '__main__':
                 'desc': 'string',
                 'name': 'string2',
                 'sensor_type': 'sensorNo'
+            },
+        'key5':
+            {
+                'port': 'image',
+                'port_num': 1,
+                'data_num': 1,
+                'desc': 'string',
+                'name': 'string2',
+                'sensor_type': 'sensorNo'
             }
-    })
+    }
+    convert_data_config(test_config)
+    convert_image_config(test_config)
