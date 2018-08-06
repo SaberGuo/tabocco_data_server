@@ -10,7 +10,7 @@ sys.path.append('../')
 from commons.macro import *
 from tools.common_tools import get_current_ts
 from tools.upyun_tools import save_to_upyun
-from models import Database_session, Device_config, Device_data
+from models import Database_session, Device_config, Device_data, Database_session_sunsheen
 
 def create_engine(user, password, database, host = '127.0.0.1', port = 3306, **kw):
     params = dict(user = user, password = password, database = database, host = host, port = port)
@@ -53,11 +53,13 @@ def get_latest_device_config_json(device_id):
             param['device_id'] = device_id
             param['device_config_id'] = device_config_id
             param['method'] = 'push_param'
-            param['data'] = convert_data_config(data)
-            param['image'] = convert_image_config(data)
+            # param['data'] = convert_data_config(data)
+            # param['image'] = convert_image_config(data)
+            param['data'] = convert_data_config_new(data)
+            param['image'] = convert_image_config_new(data)
             param['control'] = control
             param['ts'] = get_current_ts()
-        return json.dumps(param)
+        return json.dumps(param) + b'\x03'
     except Exception as e:
         logging.info(e)
         # print(e)
@@ -114,6 +116,34 @@ def convert_image_config(data):
         tmp_list.append(value)
     print(tmp_list)
     return tmp_list
+
+def convert_data_config_new(data):
+    config_list = []
+    for v in data:
+        if v['port'] != 'Img':
+            tmp = {}
+            tmp['port'] = v['port']
+            tmp['port_num'] = v['port_num']
+            tmp['sensor_type'] = v['sensor_type']
+            tmp['keys'] = {}
+            for param in v['params']:
+                tmp['keys'][str(param['data_num'])] = param['key']
+            config_list.append(tmp)
+    return config_list
+
+def convert_image_config_new(data):
+    config_list = []
+    for v in data:
+        if v['port'] == 'Img':
+            tmp = {}
+            tmp['port'] = v['port']
+            tmp['port_num'] = v['port_num']
+            tmp['sensor_type'] = v['sensor_type']
+            tmp['keys'] = {}
+            for param in v['params']:
+                tmp['keys'][str(param['data_num'])] = param['key']
+            config_list.append(tmp)
+    return config_list
 
 '''
 def get_latest_device_config_json(device_id):
@@ -177,11 +207,26 @@ def save_json_data(json_data):
                 if save_to_upyun(dict_data):
                     device_image_data = Device_data(device_id = dict_data['device_id'], device_config_id = dict_data['device_config_id'], ts = dict_data['ts'], data = dict_data['data'])
                     session.add(device_image_data)
+                    if dict_data['device_id'] == 54:
+                        device_image_data_sunsheen = Device_data(device_id = dict_data['device_id'], device_config_id = dict_data['device_config_id'], ts = dict_data['ts'], data = dict_data['data'])
+                        save_json_data_sunsheen(device_image_data_sunsheen)
             else:
                 device_value_data = Device_data(device_id = dict_data['device_id'], device_config_id = dict_data['device_config_id'], ts = dict_data['ts'], data = dict_data['data'])
                 session.add(device_value_data)
+                if dict_data['device_id'] == 54:
+                    device_value_data_sunsheen = Device_data(device_id = dict_data['device_id'], device_config_id = dict_data['device_config_id'], ts = dict_data['ts'], data = dict_data['data'])
+                    save_json_data_sunsheen(device_value_data_sunsheen)
         print('after execution')
         logging.info('after execution')
+    except Exception as e:
+        logging.info(e)
+        print(e)
+        pass
+
+def save_json_data_sunsheen(data):
+    try:
+        with Database_session_sunsheen() as session:
+            session.add(data)
     except Exception as e:
         logging.info(e)
         print(e)

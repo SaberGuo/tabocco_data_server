@@ -74,7 +74,7 @@ class TCPClient(object):
 		'''
 
 		message = {
-			'device_id': 1,
+			'device_id': 53,
 			"method": 'pull_param'
 		}
 
@@ -112,7 +112,7 @@ class TCPClient(object):
 def main():
 	io_loop = tornado.ioloop.IOLoop.instance()
 	# client = TCPClient("123.57.60.239", 7800, io_loop)
-	client = TCPClient("localhost", 7800, io_loop)
+	client = TCPClient("localhost", 7777, io_loop)
 	client.connect()
 	client.set_shutdown()
 	io_loop.start()

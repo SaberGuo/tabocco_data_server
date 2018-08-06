@@ -1,4 +1,4 @@
-#!/usr/bin/env python   
+#!/usr/bin/env python
 # -*- coding:utf-8 -*-
 
 from sqlalchemy import *
@@ -31,6 +31,23 @@ class Database_session:
     		raise e
     	finally:
     		self.session.close()
+
+
+_engine_sunsheen = create_engine('mysql+mysqlconnector://%s:%s@%s:%d/%s'%(DATA_DB_USER, DATA_DB_PASSWORD, DB_HOST, DB_HOST_PORT, 'sunsheen'))
+_Session_sunsheen = sessionmaker(bind = _engine_sunsheen)
+class Database_session_sunsheen:
+    def __enter__(self):
+        self.session = _Session_sunsheen()
+        return self.session
+    def __exit__(self, exc_type, exc_val, exc_tb):
+    	try:
+    		self.session.commit()
+    	except Exception as e:
+    		self.session.rollback()
+    		raise e
+    	finally:
+    		self.session.close()
+
 
 if __name__ == '__main__':
 	with Database_session() as session:

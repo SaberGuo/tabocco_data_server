@@ -80,7 +80,7 @@ class TornadoTCPConnection(object):
 				request = self.json_request['method']
 				if request == 'push_data':
 					self.on_push_data_request(self.json_request)
-                elif request == 'push_data_size':
+				elif request == 'push_data_size':
 					print('here in push_data_size')
 					self.on_push_data_size_request()
 				elif request == 'pull_param':
@@ -147,15 +147,18 @@ class TornadoTCPConnection(object):
 		self.json_request['method'] = 'pushing_image'
 		# print('start_receive_image_data')
 		logging.info('start_receive_image_data')
+		print('size:'+str(self.json_request['size']))
 		self.stream.read_bytes(num_bytes = self.json_request['size'], callback=stack_context.wrap(self.on_image_upload_complete), partial=False)
 
 	# call back
 	@run_on_executor
 	@email_producer.email_wrapper
 	def on_image_upload_complete(self, data):
+		print('here in on_image_upload_complete')
 		try:
 			filepath = check_device_img_file(self.json_request['device_id'])
-			url = get_image_url_local(filepath, self.json_request['acquisition_time'])
+			url = get_image_url_local(filepath, self.json_request['ts'])
+			# url = get_image_url_local(filepath, self.json_request['acquisition_time'])
 			save_image_local(data, url)
 			self.json_request['image_info'] = {self.json_request['key']:{'value':url}}
 			tmp_data = get_image_info_to_save(self.json_request)

@@ -13,33 +13,38 @@ from redis_cache import email_producer
 
 def get_reply_json(request = None, is_failed = False):
 	try:
-		print('line 1')
+		# print('line 1')
 		reply = {}
 		if is_failed:
 			reply = {'method':'failed','ts':get_current_ts()}
 		else:
 			method = request['method']
-			reply = {'device_id':request['device_id'], 'method':'', 'ts':get_current_ts()}
+			reply = {'method':'', 'ts':get_current_ts()}
 			if method == 'push_data':
 				reply['method'] = 'data_uploaded'
+				reply['device_id'] = request['device_id']
 			if method == 'push_image':
 				reply['method'] = 'push_image_ready'
+				reply['device_id'] = request['device_id']
 			if method == 'pushing_image':
 				reply['method'] = 'image_uploaded'
-                        if method == 'push_data_size':
+			if method == 'push_data_size':
 				print('here in get_reply_json')
 				reply['method'] = 'push_data_ready'
+				reply['device_id'] = request['device_id']
 			if method == 'update_device_info':
 				reply['method'] = 'update_device_info'
+				reply['device_id'] = request['device_id']
 			if method == 'update_time':
 				reply = {'ts':get_current_ts()}
-		reply_str = json.dumps(reply)
+		print(reply)
+		reply_str = json.dumps(reply) + b'\x03'
 		email_producer.insert_into_redis(reply_str, macro.EMAIL_REDIS_LIST_KEY)
 		return reply_str
 	except Exception as e:
 		logging.info(e)
 		print(e)
-		return json.dumps({'method':'failed','ts':get_current_ts()})
+		return json.dumps({'method':'failed','ts':get_current_ts()}) + b'\x03'
 
 def get_data_to_save(request, ts, data):
 	try:
@@ -65,7 +70,8 @@ def get_image_info_to_save(request):
 			tmp_data['device_id'] = request['device_id']
 			tmp_data['device_config_id'] = request['device_config_id']
 			tmp_data['data'] = request['image_info']
-			tmp_data['ts'] = get_datetime_str_from_ts(request['acquisition_time'])
+			tmp_data['ts'] = get_datetime_str_from_ts(request['ts'])
+			# tmp_data['ts'] = get_datetime_str_from_ts(request['acquisition_time'])
 			return tmp_data
 		else:
 			return None
