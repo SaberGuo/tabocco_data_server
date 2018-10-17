@@ -115,8 +115,12 @@ class TornadoTCPConnection(object):
 
 	# directly call
 	def on_push_data_request(self, request):
+		# add the redis part
+		redis_data_key = request['device_id']+'-data'
 		for ts, data in request['package'].items():
-			producer.insert_into_redis(get_data_to_save(request, ts, data), REDIS_LIST_KEY)
+			data_t = get_data_to_save(request, ts, data)
+			producer.set_into_redis(data_t, redis_data_key)
+			producer.insert_into_redis(data_t, REDIS_LIST_KEY)
 		# self.stream.write(str.encode(get_reply_json(self.json_request)), callback = stack_context.wrap(self.wait_new_request))
 		self.stream.write(str.encode(get_reply_json(self.json_request)), callback = stack_context.wrap(self.close))
 
@@ -162,6 +166,7 @@ class TornadoTCPConnection(object):
 			save_image_local(data, url)
 			self.json_request['image_info'] = {self.json_request['key']:{'value':url}}
 			tmp_data = get_image_info_to_save(self.json_request)
+			producer.set_into_redis(tmp_data,self.json_request['devie_id']+'-image')
 			if producer.insert_into_redis(tmp_data, REDIS_LIST_KEY):
 				# self.stream.write(str.encode(get_reply_json(self.json_request)), callback=stack_context.wrap(self.close))
 				self.stream.write(str.encode(get_reply_json(self.json_request)), callback=stack_context.wrap(self.wait_new_request))

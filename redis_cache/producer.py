@@ -1,4 +1,4 @@
-#!/usr/bin/env python   
+#!/usr/bin/env python
 # -*- coding:utf-8 -*-
 
 import sys
@@ -20,7 +20,17 @@ def insert_into_redis(data, key):
 		logging.info(e)
 		# print(e)
 		return False
-
+def set_redis(data, key):
+	try:
+		if data:
+			redis_connection = redis.StrictRedis()
+			redis_connection.set(key, json.dumps(data))
+			return True
+		else:
+			return False
+	except Exception as e:
+		logging.info(e)
+		return False
 if __name__ == '__main__':
 	request = {
 		'device_id': 1,

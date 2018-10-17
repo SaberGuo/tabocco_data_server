@@ -53,6 +53,8 @@ def get_data_to_save(request, ts, data):
 		tmp_data['device_id'] = request['device_id']
 		tmp_data['device_config_id'] = request['device_config_id']
 		tmp_data['data'] = data
+		# add type of data
+		tmp_data['type'] = 'data'
 		tmp_data['ts'] = get_datetime_str_from_ts(ts)
 		# print(tmp_data)
 		return tmp_data
@@ -70,6 +72,8 @@ def get_image_info_to_save(request):
 			tmp_data['device_id'] = request['device_id']
 			tmp_data['device_config_id'] = request['device_config_id']
 			tmp_data['data'] = request['image_info']
+			#add the type of data
+			tmp_data['type'] = 'image'
 			tmp_data['ts'] = get_datetime_str_from_ts(request['ts'])
 			# tmp_data['ts'] = get_datetime_str_from_ts(request['acquisition_time'])
 			return tmp_data
