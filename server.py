@@ -70,7 +70,7 @@ class TornadoTCPConnection(object):
 		try:
 			data_str = native_str(data.decode('UTF-8'))
 			logging.info(data_str)
-			# print(data_str)
+			print(data_str)
 			tmp = json.loads(data_str)
 			for k, v in tmp.items():
 				# if not self.json_request.__contains__(k):
@@ -84,6 +84,7 @@ class TornadoTCPConnection(object):
 					print('here in push_data_size')
 					self.on_push_data_size_request()
 				elif request == 'pull_param':
+					logging.info('pull_param')
 					self.on_pull_param_request(self.json_request)
 				elif request == 'push_image':
 					# print('push_image')
@@ -116,10 +117,11 @@ class TornadoTCPConnection(object):
 	# directly call
 	def on_push_data_request(self, request):
 		# add the redis part
-		redis_data_key = request['device_id']+'-data'
+		redis_data_key = str(request['device_id'])+'-data'
 		for ts, data in request['package'].items():
 			data_t = get_data_to_save(request, ts, data)
-			producer.set_into_redis(data_t, redis_data_key)
+                        logging.info(data_t)
+			producer.set_redis(data_t, redis_data_key)
 			producer.insert_into_redis(data_t, REDIS_LIST_KEY)
 		# self.stream.write(str.encode(get_reply_json(self.json_request)), callback = stack_context.wrap(self.wait_new_request))
 		self.stream.write(str.encode(get_reply_json(self.json_request)), callback = stack_context.wrap(self.close))
@@ -128,6 +130,8 @@ class TornadoTCPConnection(object):
 	@run_on_executor
 	def on_pull_param_request(self, request):
 		param = get_latest_device_config_json(request['device_id'])
+		logging.info("param:\n")
+		logging.info(param)
 		if param:
                         print(len(str.encode(param)))
 			self.stream.write(str.encode(param), callback=stack_context.wrap(self.wait_push_param_reply))
@@ -151,14 +155,14 @@ class TornadoTCPConnection(object):
 		self.json_request['method'] = 'pushing_image'
 		# print('start_receive_image_data')
 		logging.info('start_receive_image_data')
-		print('size:'+str(self.json_request['size']))
+		logging.info('size:'+str(self.json_request['size']))
 		self.stream.read_bytes(num_bytes = self.json_request['size'], callback=stack_context.wrap(self.on_image_upload_complete), partial=False)
 
 	# call back
 	@run_on_executor
 	@email_producer.email_wrapper
 	def on_image_upload_complete(self, data):
-		print('here in on_image_upload_complete')
+		logging.info('here in on_image_upload_complete')
 		try:
 			filepath = check_device_img_file(self.json_request['device_id'])
 			url = get_image_url_local(filepath, self.json_request['ts'])
@@ -166,7 +170,7 @@ class TornadoTCPConnection(object):
 			save_image_local(data, url)
 			self.json_request['image_info'] = {self.json_request['key']:{'value':url}}
 			tmp_data = get_image_info_to_save(self.json_request)
-			producer.set_into_redis(tmp_data,self.json_request['devie_id']+'-image')
+			producer.set_redis(tmp_data,str(self.json_request['device_id'])+'-image')
 			if producer.insert_into_redis(tmp_data, REDIS_LIST_KEY):
 				# self.stream.write(str.encode(get_reply_json(self.json_request)), callback=stack_context.wrap(self.close))
 				self.stream.write(str.encode(get_reply_json(self.json_request)), callback=stack_context.wrap(self.wait_new_request))

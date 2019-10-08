@@ -31,6 +31,7 @@ class Device_data(Base):
 	updated_at = Column(TIMESTAMP, nullable = False)
 	created_at = Column(TIMESTAMP, nullable = False)
 	deleted_at = Column(TIMESTAMP, nullable = True)
+        type = Column(VARCHAR,nullable=False)
 
 	device_config_id = Column(INTEGER(display_width = 10), ForeignKey('device_config.id'))
 	device_config = relationship('Device_config', back_populates = 'device_datas')

@@ -12,6 +12,8 @@ def insert_into_redis(data, key):
 	try:
 		if data:
 			redis_connection = redis.StrictRedis()
+                        logging.info(key)
+                        logging.info(data)
 			redis_connection.lpush(key, json.dumps(data))
 			return True
 		else:
@@ -23,7 +25,7 @@ def insert_into_redis(data, key):
 def set_redis(data, key):
 	try:
 		if data:
-			redis_connection = redis.StrictRedis()
+			redis_connection = redis.StrictRedis(port=6378)
 			redis_connection.set(key, json.dumps(data))
 			return True
 		else:
@@ -42,6 +44,6 @@ if __name__ == '__main__':
 			'value': 5
 		}
 	}
-	data_to_save = get_data_to_save(request, ts, data)
-	print(data_to_save)
-	insert_into_redis(data_to_save, 'redis_list_key_1')
+	#data_to_save = get_data_to_save(request, ts, data)
+	#print(data_to_save)
+	set_redis("ttt", 'test')

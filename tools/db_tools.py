@@ -43,8 +43,10 @@ def get_latest_device_config_json(device_id):
         if not isinstance(device_id, int):
             device_id = int(device_id)
         param = {}
+        logging.info(device_id)
         with database_resource() as cursor:
             sql = 'select `%s`, `%s`, `%s` from `%s` where `%s` = %d order by id desc'%('id', 'data', 'control', 'device_config', 'device_id', device_id)
+            logging.info(sql)
             cursor.execute(sql)
             value = cursor.fetchone()
             device_config_id = value[0]
@@ -52,17 +54,19 @@ def get_latest_device_config_json(device_id):
             control = json.loads(value[2])
             param['device_id'] = device_id
             param['device_config_id'] = device_config_id
-            param['method'] = 'push_param'
+            logging.info(value[1])
+            #param['method'] = 'push_param'
             # param['data'] = convert_data_config(data)
             # param['image'] = convert_image_config(data)
+            logging.info(convert_data_config_new(data))
             param['data'] = convert_data_config_new(data)
             param['image'] = convert_image_config_new(data)
             param['control'] = control
-            param['ts'] = get_current_ts()
-        return json.dumps(param) + b'\x03'
+            #param['ts'] = get_current_ts()
+            print(param)
+            return json.dumps(param)
     except Exception as e:
         logging.info(e)
-        # print(e)
         return None
 
 def convert_data_config(data):
@@ -127,6 +131,7 @@ def convert_data_config_new(data):
             tmp['sensor_type'] = v['sensor_type']
             tmp['keys'] = {}
             for param in v['params']:
+                logging.info(param)
                 tmp['keys'][str(param['data_num'])] = param['key']
             config_list.append(tmp)
     return config_list
@@ -205,13 +210,13 @@ def save_json_data(json_data):
         with Database_session() as session:
             if dict_data['type'] == 'image':
                 if save_to_upyun(dict_data):
-                    device_image_data = Device_data(device_id = dict_data['device_id'], device_config_id = dict_data['device_config_id'], ts = dict_data['ts'], data = dict_data['data'])
+                    device_image_data = Device_data(device_id = dict_data['device_id'], device_config_id = dict_data['device_config_id'],type=dict_data['type'], ts = dict_data['ts'], data = dict_data['data'])
                     session.add(device_image_data)
                     if dict_data['device_id'] == 54:
                         device_image_data_sunsheen = Device_data(device_id = dict_data['device_id'], device_config_id = dict_data['device_config_id'], ts = dict_data['ts'], data = dict_data['data'])
                         save_json_data_sunsheen(device_image_data_sunsheen)
             else:
-                device_value_data = Device_data(device_id = dict_data['device_id'], device_config_id = dict_data['device_config_id'], ts = dict_data['ts'], data = dict_data['data'])
+                device_value_data = Device_data(device_id = dict_data['device_id'],type=dict_data['type'], device_config_id = dict_data['device_config_id'], ts = dict_data['ts'], data = dict_data['data'])
                 session.add(device_value_data)
                 if dict_data['device_id'] == 54:
                     device_value_data_sunsheen = Device_data(device_id = dict_data['device_id'], device_config_id = dict_data['device_config_id'], ts = dict_data['ts'], data = dict_data['data'])
