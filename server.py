@@ -122,7 +122,7 @@ class TornadoTCPConnection(object):
 			data_t = get_data_to_save(request, ts, data)
                         logging.info(data_t)
 			producer.set_redis(data_t, redis_data_key)
-			producer.insert_into_redis(data_t, REDIS_LIST_KEY)
+			producer.insert_into_redis(data_t, REDIS_LIST_MONGO_DATA_KEY)
 		# self.stream.write(str.encode(get_reply_json(self.json_request)), callback = stack_context.wrap(self.wait_new_request))
 		self.stream.write(str.encode(get_reply_json(self.json_request)), callback = stack_context.wrap(self.close))
 
@@ -165,13 +165,17 @@ class TornadoTCPConnection(object):
 		logging.info('here in on_image_upload_complete')
 		try:
 			filepath = check_device_img_file(self.json_request['device_id'])
+                        logging.info(self.json_request)
 			url = get_image_url_local(filepath, self.json_request['ts'])
-			# url = get_image_url_local(filepath, self.json_request['acquisition_time'])
+			#url = get_image_url_local(filepath, self.json_request['acquisition_time'])
+                        logging.info(url)
 			save_image_local(data, url)
 			self.json_request['image_info'] = {self.json_request['key']:{'value':url}}
 			tmp_data = get_image_info_to_save(self.json_request)
+                        logging.info(tmp_data)
 			producer.set_redis(tmp_data,str(self.json_request['device_id'])+'-image')
-			if producer.insert_into_redis(tmp_data, REDIS_LIST_KEY):
+                        logging.info(url)
+			if producer.insert_into_redis(tmp_data, REDIS_LIST_MONGO_IMAGE_KEY):
 				# self.stream.write(str.encode(get_reply_json(self.json_request)), callback=stack_context.wrap(self.close))
 				self.stream.write(str.encode(get_reply_json(self.json_request)), callback=stack_context.wrap(self.wait_new_request))
 			else:

@@ -25,7 +25,7 @@ def insert_into_redis(data, key):
 def set_redis(data, key):
 	try:
 		if data:
-			redis_connection = redis.StrictRedis(port=6378)
+			redis_connection = redis.StrictRedis(port=6379)
 			redis_connection.set(key, json.dumps(data))
 			return True
 		else:

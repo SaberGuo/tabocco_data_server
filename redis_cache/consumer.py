@@ -28,12 +28,15 @@ class RedisConsumer(object):
 				logging.info('redis consumer receive alert!')
 				print('redis consumer receive alert!')
 				json_data = item[1]
+                                print(json_data)
 				if self.key == REDIS_LIST_KEY:
     					save_json_data(json_data)
 				if self.key == REDIS_LIST_MONGO_DATA_KEY:
-    					insert_mongo_data(json_data)
-				if self.ley == REDIS_LIST_MONGO_IMAGE_KEY:
-    					insert_mongo_image(json_data)
+                                        json_data_raw = json.loads(json_data)
+    					insert_mongo_data(json_data_raw)
+				if self.key == REDIS_LIST_MONGO_IMAGE_KEY:
+                                        json_data_raw = json.loads(json_data)
+    					insert_mongo_image(json_data_raw)
 			except Exception as e:
 				logging.info(e)
 				print(e)

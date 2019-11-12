@@ -38,13 +38,13 @@ def get_reply_json(request = None, is_failed = False):
 			if method == 'update_time':
 				reply = {'ts':get_current_ts()}
 		print(reply)
-		reply_str = json.dumps(reply) + b'\x03'
+		reply_str = json.dumps(reply)
 		email_producer.insert_into_redis(reply_str, macro.EMAIL_REDIS_LIST_KEY)
 		return reply_str
 	except Exception as e:
 		logging.info(e)
 		print(e)
-		return json.dumps({'method':'failed','ts':get_current_ts()}) + b'\x03'
+		return json.dumps({'method':'failed','ts':get_current_ts()}) 
 
 def get_data_to_save(request, ts, data):
 	try:
@@ -75,7 +75,7 @@ def get_image_info_to_save(request):
 			#add the type of data
 			tmp_data['type'] = 'image'
 			tmp_data['ts'] = get_datetime_str_from_ts(request['ts'])
-			# tmp_data['ts'] = get_datetime_str_from_ts(request['acquisition_time'])
+			#tmp_data['ts'] = get_datetime_str_from_ts(request['acquisition_time'])
 			return tmp_data
 		else:
 			return None

@@ -11,7 +11,7 @@ import socket
 import json
 import os
 
-file_name = '10630a450941b72c1c1357b302f56c18.jpg'
+file_name = 'test.jpg'
 file_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), file_name)
 file_size = os.path.getsize(file_path)
 
@@ -32,11 +32,11 @@ class TCPClient(object):
 		self.get_stream()
 		self.stream.connect((self.host, self.port), self.send_message)
 	def on_receive(self, data):
-		# message = json.loads(data)
+		#json_message = json.loads(data)
 		json_message = native_str(data.decode('UTF-8'))
 		logging.info("Received: %s"%(json_message))
 		print("Received: %s"%(json_message))
-		dict_message = json.loads(json_message)
+		dict_message = json.loads(json_message.strip())
 		if dict_message['method'] == 'push_param':
 			logging.info('param_updated')
 			# print('param_updated')
@@ -62,14 +62,13 @@ class TCPClient(object):
 	def send_message(self):
 		logging.info("Send message....")
 		global file_size
-		'''
 		message = {
 			"device_id": 1234,
 			"device_config_id": 100,
 			"method": "push_image",
 			"key": 'etateetawetwe',
 			"size": file_size,
-			'acquisition_time': 1479798817
+			'ts': 1479798817
 		}
 		'''
 
@@ -77,8 +76,9 @@ class TCPClient(object):
 			'device_id': 53,
 			"method": 'pull_param'
 		}
+                '''
+                '''
 
-		'''
 		message = {
 			'device_id': 99,
 			'device_config_id': 98,
@@ -102,7 +102,7 @@ class TCPClient(object):
 				}
 			}
 		}
-		'''
+                '''
 		data = json.dumps(message)
 		self.stream.write(str.encode(data))
 		self.stream.read_bytes(num_bytes = self.cache_size, callback = self.on_receive, partial=True)
@@ -112,7 +112,7 @@ class TCPClient(object):
 def main():
 	io_loop = tornado.ioloop.IOLoop.instance()
 	# client = TCPClient("123.57.60.239", 7800, io_loop)
-	client = TCPClient("localhost", 7777, io_loop)
+	client = TCPClient("localhost", 8765, io_loop)
 	client.connect()
 	client.set_shutdown()
 	io_loop.start()
