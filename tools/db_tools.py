@@ -10,7 +10,7 @@ sys.path.append('../')
 from commons.macro import *
 from tools.common_tools import get_current_ts
 from tools.upyun_tools import save_to_upyun
-from models import Database_session, Device_config, Device_data
+from models import Database_session, Device_config, Device_data, Database_session_sunsheen
 
 reload(sys)
 sys.setdefaultencoding('utf-8') 
@@ -46,8 +46,10 @@ def get_latest_device_config_json(device_id):
         if not isinstance(device_id, int):
             device_id = int(device_id)
         param = {}
+        logging.info(device_id)
         with database_resource() as cursor:
             sql = 'select `%s`, `%s`, `%s` from `%s` where `%s` = %d order by id desc'%('id', 'data', 'control', 'device_config', 'device_id', device_id)
+            logging.info(sql)
             cursor.execute(sql)
             value = cursor.fetchone()
             device_config_id = value[0]
@@ -55,17 +57,28 @@ def get_latest_device_config_json(device_id):
             control = json.loads(value[2])
             param['device_id'] = device_id
             param['device_config_id'] = device_config_id
-            param['method'] = 'push_param'
-            param['config'] = data
+            logging.info(value[1])
+            #param['method'] = 'push_param'
+            # param['data'] = convert_data_config(data)
+            # param['image'] = convert_image_config(data)
+            logging.info(convert_data_config_new(data))
+            param['data'] = convert_data_config_new(data)
+            param['image'] = convert_image_config_new(data)
             param['control'] = control
+<<<<<<< HEAD
             param['ts'] = get_current_ts()
         # print(param)
         return json.dumps(param)
+=======
+            #param['ts'] = get_current_ts()
+            print(param)
+            return json.dumps(param)
+>>>>>>> 95ad56ee1faf0a8719139ddc130d53b25e836d29
     except Exception as e:
         logging.info(e)
-        # print(e)
         return None
 
+<<<<<<< HEAD
 def get_latest_device_config_string(device_id):
     try:
         if not isinstance(device_id, int):
@@ -96,6 +109,88 @@ def get_latest_device_config_string(device_id):
         print(e)
         return None
         # raise e
+=======
+def convert_data_config(data):
+    tmp_dict = {}
+    for k, v in data.items():
+        if v['port'] is not 'image':
+            port = v['port']
+            port_num = v['port_num']
+            data_num = str(v['data_num'])
+            desc = v['desc']
+            name = v['name']
+            sensor_type = v['sensor_type']
+            tmp_dict_key = name+str(port_num)
+            if tmp_dict.has_key(tmp_dict_key):
+                tmp_dict[tmp_dict_key]['keys'][data_num] = k
+            else:
+                tmp_dict[tmp_dict_key] = {}
+                tmp_dict[tmp_dict_key]['port'] = port
+                tmp_dict[tmp_dict_key]['port_num'] = port_num
+                tmp_dict[tmp_dict_key]['sensor_type'] = sensor_type
+                tmp_dict[tmp_dict_key]['keys'] = {}
+                tmp_dict[tmp_dict_key]['keys'][data_num] = k
+    tmp_list = []
+    for value in tmp_dict.values():
+        tmp_list.append(value)
+    print(tmp_list)
+    return tmp_list
+
+def convert_image_config(data):
+    tmp_dict = {}
+    for k, v in data.items():
+        if v['port'] == 'image':
+            port = v['port']
+            port_num = v['port_num']
+            data_num = str(v['data_num'])
+            desc = v['desc']
+            name = v['name']
+            sensor_type = v['sensor_type']
+            tmp_dict_key = name+str(port_num)
+            if tmp_dict.has_key(tmp_dict_key):
+                tmp_dict[tmp_dict_key]['keys'][data_num] = k
+            else:
+                tmp_dict[tmp_dict_key] = {}
+                tmp_dict[tmp_dict_key]['port'] = port
+                tmp_dict[tmp_dict_key]['port_num'] = port_num
+                tmp_dict[tmp_dict_key]['sensor_type'] = sensor_type
+                tmp_dict[tmp_dict_key]['keys'] = {}
+                tmp_dict[tmp_dict_key]['keys'][data_num] = k
+    tmp_list = []
+    for value in tmp_dict.values():
+        tmp_list.append(value)
+    print(tmp_list)
+    return tmp_list
+
+def convert_data_config_new(data):
+    config_list = []
+    for v in data:
+        if v['port'] != 'Img':
+            tmp = {}
+            tmp['port'] = v['port']
+            tmp['port_num'] = v['port_num']
+            tmp['sensor_type'] = v['sensor_type']
+            tmp['keys'] = {}
+            for param in v['params']:
+                logging.info(param)
+                tmp['keys'][str(param['data_num'])] = param['key']
+            config_list.append(tmp)
+    return config_list
+
+def convert_image_config_new(data):
+    config_list = []
+    for v in data:
+        if v['port'] == 'Img':
+            tmp = {}
+            tmp['port'] = v['port']
+            tmp['port_num'] = v['port_num']
+            tmp['sensor_type'] = v['sensor_type']
+            tmp['keys'] = {}
+            for param in v['params']:
+                tmp['keys'][str(param['data_num'])] = param['key']
+            config_list.append(tmp)
+    return config_list
+>>>>>>> 95ad56ee1faf0a8719139ddc130d53b25e836d29
 
 '''
 def get_latest_device_config_json(device_id):
@@ -157,13 +252,28 @@ def save_json_data(json_data):
         with Database_session() as session:
             if dict_data['type'] == 'image':
                 if save_to_upyun(dict_data):
-                    device_image_data = Device_data(device_id = dict_data['device_id'], device_config_id = dict_data['device_config_id'], ts = dict_data['ts'], data = dict_data['data'])
+                    device_image_data = Device_data(device_id = dict_data['device_id'], device_config_id = dict_data['device_config_id'],type=dict_data['type'], ts = dict_data['ts'], data = dict_data['data'])
                     session.add(device_image_data)
+                    if dict_data['device_id'] == 54:
+                        device_image_data_sunsheen = Device_data(device_id = dict_data['device_id'], device_config_id = dict_data['device_config_id'], ts = dict_data['ts'], data = dict_data['data'])
+                        save_json_data_sunsheen(device_image_data_sunsheen)
             else:
-                device_value_data = Device_data(device_id = dict_data['device_id'], device_config_id = dict_data['device_config_id'], ts = dict_data['ts'], data = dict_data['data'])
+                device_value_data = Device_data(device_id = dict_data['device_id'],type=dict_data['type'], device_config_id = dict_data['device_config_id'], ts = dict_data['ts'], data = dict_data['data'])
                 session.add(device_value_data)
+                if dict_data['device_id'] == 54:
+                    device_value_data_sunsheen = Device_data(device_id = dict_data['device_id'], device_config_id = dict_data['device_config_id'], ts = dict_data['ts'], data = dict_data['data'])
+                    save_json_data_sunsheen(device_value_data_sunsheen)
         print('after execution')
         logging.info('after execution')
+    except Exception as e:
+        logging.info(e)
+        print(e)
+        pass
+
+def save_json_data_sunsheen(data):
+    try:
+        with Database_session_sunsheen() as session:
+            session.add(data)
     except Exception as e:
         logging.info(e)
         print(e)
@@ -256,5 +366,57 @@ if __name__ == '__main__':
     # })
 
     # save_json_data(json_data_to_save)
+<<<<<<< HEAD
     # get_latest_device_config_json(5)
     get_latest_device_config_string(5)
+=======
+    test_config = {
+        'key1':
+            {
+                'port': 'string',
+                'port_num': 0,
+                'data_num': 0,
+                'desc': 'string',
+                'name': 'string1',
+                'sensor_type': 'sensorNo'
+            },
+        'key2':
+            {
+                'port': 'string',
+                'port_num': 0,
+                'data_num': 1,
+                'desc': 'string',
+                'name': 'string1',
+                'sensor_type': 'sensorNo'
+            },
+        'key3':
+            {
+                'port': 'string',
+                'port_num': 1,
+                'data_num': 0,
+                'desc': 'string',
+                'name': 'string2',
+                'sensor_type': 'sensorNo'
+            },
+        'key4':
+            {
+                'port': 'string',
+                'port_num': 1,
+                'data_num': 1,
+                'desc': 'string',
+                'name': 'string2',
+                'sensor_type': 'sensorNo'
+            },
+        'key5':
+            {
+                'port': 'image',
+                'port_num': 1,
+                'data_num': 1,
+                'desc': 'string',
+                'name': 'string2',
+                'sensor_type': 'sensorNo'
+            }
+    }
+    convert_data_config(test_config)
+    convert_image_config(test_config)
+>>>>>>> 95ad56ee1faf0a8719139ddc130d53b25e836d29

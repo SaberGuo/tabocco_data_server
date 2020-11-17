@@ -11,8 +11,8 @@ import socket
 import json
 import os
 
-file_path = '/home/sonic513/10630a450941b72c1c1357b302f56c18.jpg'
-# file_path = '/Users/guoxiao/Documents/test.jpg'
+file_name = '10630a450941b72c1c1357b302f56c18.jpg'
+file_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), file_name)
 file_size = os.path.getsize(file_path)
 
 class TCPClient(object):
@@ -72,12 +72,12 @@ class TCPClient(object):
 			'acquisition_time': 1479798817
 		}
 		'''
-		
+
 		message = {
-			'device_id': 1,
+			'device_id': 53,
 			"method": 'pull_param'
 		}
-		
+
 		'''
 		message = {
 			'device_id': 99,
@@ -112,7 +112,7 @@ class TCPClient(object):
 def main():
 	io_loop = tornado.ioloop.IOLoop.instance()
 	# client = TCPClient("123.57.60.239", 7800, io_loop)
-	client = TCPClient("localhost", 7800, io_loop)
+	client = TCPClient("localhost", 7777, io_loop)
 	client.connect()
 	client.set_shutdown()
 	io_loop.start()

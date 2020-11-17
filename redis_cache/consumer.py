@@ -17,6 +17,8 @@ class RedisConsumer(object):
 		# self.redis_connection = redis.StrictRedis(host=host, port=port, db=db if db else REDIS_DB_NUM)
 		self.redis_connection = redis.StrictRedis(host=host, port=port)
 		self.key = key if key else REDIS_LIST_KEY
+                logging.info(self.key)
+                print(self.key)
 
 	def start(self):
 		while True:
