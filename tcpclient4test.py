@@ -11,7 +11,7 @@ import socket
 import json
 import os
 
-file_name = '10630a450941b72c1c1357b302f56c18.jpg'
+file_name = '/home/www/logo.png'
 file_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), file_name)
 file_size = os.path.getsize(file_path)
 
@@ -71,7 +71,6 @@ class TCPClient(object):
 			"size": file_size,
 			'acquisition_time': 1479798817
 		}
-		'''
 
 		message = {
 			'device_id': 53,
@@ -102,7 +101,7 @@ class TCPClient(object):
 				}
 			}
 		}
-		'''
+                message={'device_id':1,'device_config_id':1,'method':'push_data','package':{'1606843867':{'FP_YX_TOTAL_SEND_NUM_1':{'value':0},'FP_YX_TOTAL_RECEIVE_NUM_1':{'value':0},'FP_YX__SEND_YES_NUM_1':{'value':0},'FP_YX_RECEIVE_YES_NUM_1':{'value':0},'FP_YX_MONEY_0':{'value':316.07},'FP_STATE_ENABLE_0':{'value':1},'FP_YX_SIGN_0':{'value':5},'FP_YX_NET_0':{'value':1},'FP_YX_DATA_NUM_0':{'value':0},'FP_SEND_STATE_0':{'value':0},'FP_REV_STATE_0':{'value':0},'FP_CHECK_NUM_0':{'value':0},'FP_DISTANCE':{'value':0}}}}
 		data = json.dumps(message)
 		self.stream.write(str.encode(data))
 		self.stream.read_bytes(num_bytes = self.cache_size, callback = self.on_receive, partial=True)
@@ -112,7 +111,7 @@ class TCPClient(object):
 def main():
 	io_loop = tornado.ioloop.IOLoop.instance()
 	# client = TCPClient("123.57.60.239", 7800, io_loop)
-	client = TCPClient("localhost", 7777, io_loop)
+	client = TCPClient("localhost", 9898, io_loop)
 	client.connect()
 	client.set_shutdown()
 	io_loop.start()

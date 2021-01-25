@@ -27,6 +27,7 @@ class RedisConsumer(object):
 				logging.info('redis consumer receive alert!')
 				print('redis consumer receive alert!')
 				json_data = item[1]
+                                print(json_data)
 				save_json_data(json_data)
 			except Exception as e:
 				logging.info(e)
