@@ -12,6 +12,7 @@ from models.device import Device
 from models.station import Station
 from models.device_config import Device_config
 from models.device_data import Device_data
+from models.Device_loc import Device_loc
 from commons.macro import *
 
 # dialect+driver://username:password@host:port/

@@ -97,6 +97,8 @@ class TornadoTCPConnection(object):
 				# 	self.close()
 				if request == 'push_data':
 					self.on_push_data_request(self.json_request)
+				elif request == 'push_location':
+					self.on_push_location_request(self.json_request)
 				elif request == 'push_data_size':
 					print('here in push_data_size')
 					self.on_push_data_size_request()
@@ -126,7 +128,13 @@ class TornadoTCPConnection(object):
 	# directly call
         def on_push_data_size_request(self):
 		self.stream.write(str.encode(get_reply_json(self.json_request)), callback = stack_context.wrap(self.wait_push_data_request))
-
+	def on_push_location_request(self, request):
+		redis_data_key = str(request['device_id'])+'-location'
+		for ts, data in request['package'].items():
+			data_t = get_location_to_save(request, ts, data)
+			producer.set_redis(data_t, redis_data_key)
+			producer.insert_into_redis(data_t, REDIS_LOC_KEY)
+		self.stream.write(str.encode(get_reply_json(self.json_request)), callback = stack_context.wrap(self.wait_new_request))
 	# directly call
 	def on_push_data_request(self, request):
 		# add the redis part
@@ -136,8 +144,8 @@ class TornadoTCPConnection(object):
                         logging.info(data_t)
 			producer.set_redis(data_t, redis_data_key)
 			producer.insert_into_redis(data_t, REDIS_LIST_KEY)
-		# self.stream.write(str.encode(get_reply_json(self.json_request)), callback = stack_context.wrap(self.wait_new_request))
-		self.stream.write(str.encode(get_reply_json(self.json_request)), callback = stack_context.wrap(self.close))
+		self.stream.write(str.encode(get_reply_json(self.json_request)), callback = stack_context.wrap(self.wait_new_request))
+		#self.stream.write(str.encode(get_reply_json(self.json_request)), callback = stack_context.wrap(self.close))
 
 	# directly call
 	@run_on_executor

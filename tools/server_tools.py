@@ -83,6 +83,18 @@ def get_data_to_save(request, ts, data):
 		email_producer.insert_into_redis(e, macro.EMAIL_REDIS_LIST_KEY)
 		return None
 
+def get_location_to_save(request, ts, data):
+	try:
+		tmp_data = {}
+		tmp_data['device_id'] = request['device_id']
+		tmp_data['device_config_id'] = request['device_config_id']
+		tmp_data['data'] = data
+		tmp_data['ts'] = get_datetime_str_from_ts(ts)
+		return tmp_data
+	except Exception as e:
+		logging.info(e)
+		return None
+		
 def get_image_info_to_save(request):
 	try:
 		if request:

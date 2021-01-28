@@ -10,7 +10,7 @@ sys.path.append('../')
 from commons.macro import *
 from tools.common_tools import get_current_ts
 from tools.upyun_tools import save_to_upyun
-from models import Database_session, Device_config, Device_data, Database_session_sunsheen
+from models import Database_session, Device_config, Device_data, Device_loc, Database_session_sunsheen
 
 reload(sys)
 sys.setdefaultencoding('utf-8') 
@@ -231,7 +231,19 @@ def get_latest_device_config_json(device_id):
 #         print(e)
 #         pass
 
+def save_json_loc(json_data):
+    try:
+        dict_data = json.loads(json_data)
+        if not isinstance(dict_data['device_id'], int):
+            dict_data['device_id'] = int(dict_data['device_id'])
+        if not isinstance(dict_data['device_config_id'], int):
+            dict_data['device_config_id'] = int(dict_data['device_config_id'])
+        with Database_session() ass session:
+            device_value_data = Device_loc(device_id = dict_data['device_id'], device_config_id = dict_data['device_config_id'], ts = dict_data['ts'], data = dict_data['data'])
+            session.add(device_value_data)
 
+    except Exception as e:
+        pass
 def save_json_data(json_data):
     try:
         dict_data = json.loads(json_data)

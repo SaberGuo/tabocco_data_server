@@ -8,3 +8,4 @@ macro.py
 test.py
 /__pycache__/
 /images/
+service/*.pyc
