@@ -21,8 +21,8 @@ deleted_at timestamp nullable
 null nullable
 '''
 
-class Device_data(Base):
-	__tablename__ = 'device_data'
+class Device_loc(Base):
+	__tablename__ = 'locations'
 
 	id = Column(INTEGER(display_width = 10), primary_key = True)
 	# device_id = Column(INTEGER(display_width = 10))
@@ -31,10 +31,9 @@ class Device_data(Base):
 	updated_at = Column(TIMESTAMP, nullable = False)
 	created_at = Column(TIMESTAMP, nullable = False)
 	deleted_at = Column(TIMESTAMP, nullable = True)
-        type = Column(VARCHAR,nullable=False)
 
 	device_config_id = Column(INTEGER(display_width = 10), ForeignKey('device_config.id'))
-	device_config = relationship('Device_config', back_populates = 'device_datas')
+	device_config = relationship('Device_config', back_populates = 'locations')
         
 	device_id = Column(INTEGER(display_width = 10), ForeignKey('device.id'))
-	device = relationship('Device', back_populates = 'device_datas')
+	device = relationship('Device', back_populates = 'locations')
